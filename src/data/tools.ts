@@ -1227,7 +1227,7 @@ export const TOOLS: readonly Tool[] = [
       {
         title: 'Upload your PDF document',
         description:
-          'Select any PDF up to 50 MB (or test with the built-in 3-page sample PDF). Files never leave your browser.',
+          'Select any PDF up to 50 MB (or test with the built-in 3-page sample PDF) to view a live page preview directly in your browser. Files never leave your device.',
       },
       {
         title: 'Create or upload your signature',
@@ -1235,9 +1235,9 @@ export const TOOLS: readonly Tool[] = [
           'Draw with mouse or finger, type your name in signature cursive, or upload a PNG/JPG signature image.',
       },
       {
-        title: 'Choose placement & apply stamp',
+        title: 'Drag to position & apply stamp',
         description:
-          'Select the target page and position (bottom-right, bottom-left, top-right, or custom), then apply the visual stamp processed and linearized via 100% in-browser qpdf-wasm.',
+          'Switch pages in the PDF preview, drag your signature directly with touch or mouse (or choose a preset / exact X-Y coordinates), and apply the visual stamp cleanly in your browser.',
       },
     ],
     faqs: [

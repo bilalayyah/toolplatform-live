@@ -1,9 +1,11 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   AlertCircle,
   ArrowDown,
   ArrowUp,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Download,
   Eye,
   EyeOff,
@@ -12,6 +14,7 @@ import {
   KeyRound,
   Loader2,
   Lock,
+  Move,
   PenTool,
   RefreshCw,
   ShieldAlert,
@@ -32,6 +35,15 @@ import * as XLSX from 'xlsx';
 import mammoth from 'mammoth';
 import PptxGenJS from 'pptxgenjs';
 import { protectPdfBrowser, unlockPdfBrowser } from '../../lib/qpdfProcessor';
+import {
+  type SignPositionPreset,
+  applyPointerDeltaToPositionPt,
+  computeSignatureBoxRectPt,
+  computeSignatureImageSizePt,
+  renderTypedSignatureDataUrl,
+  resolveSignaturePositionPt,
+  signatureBoxToOverlayPct,
+} from '../../lib/signPdfGeometry';
 
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
@@ -321,7 +333,7 @@ export function PdfToolsRunner({tool}: Props) {
   const [signTypedStyle, setSignTypedStyle] = useState<'cursive' | 'brush' | 'formal'>('cursive');
   const [signUploadedFile, setSignUploadedFile] = useState<File | null>(null);
   const [signPageNumber, setSignPageNumber] = useState<number>(1);
-  const [signPosition, setSignPosition] = useState<'bottom-right' | 'bottom-left' | 'bottom-center' | 'top-right' | 'custom'>('bottom-right');
+  const [signPosition, setSignPosition] = useState<SignPositionPreset>('bottom-right');
   const [signCustomX, setSignCustomX] = useState<number>(40);
   const [signCustomY, setSignCustomY] = useState<number>(40);
   const [signerName, setSignerName] = useState<string>('Authorized Signer');
@@ -329,8 +341,35 @@ export function PdfToolsRunner({tool}: Props) {
   const [includeStampBadge, setIncludeStampBadge] = useState<boolean>(true);
   const [signScale, setSignScale] = useState<number>(1);
   const [hasDrawn, setHasDrawn] = useState<boolean>(false);
+  const [drawnSigDataUrl, setDrawnSigDataUrl] = useState<string | null>(null);
+  const [uploadSigMeta, setUploadSigMeta] = useState<{
+    dataUrl: string;
+    width: number;
+    height: number;
+  } | null>(null);
+  const [signUploadError, setSignUploadError] = useState<string | null>(null);
+  const [signPreviewPageCount, setSignPreviewPageCount] = useState<number>(0);
+  const [signPreviewPageNum, setSignPreviewPageNum] = useState<number>(1);
+  const [signPreviewPageSize, setSignPreviewPageSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+  const [signPreviewLoading, setSignPreviewLoading] = useState<boolean>(false);
+  const [signPreviewError, setSignPreviewError] = useState<string | null>(null);
+  const [isDraggingSig, setIsDraggingSig] = useState<boolean>(false);
   const sigCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef<boolean>(false);
+  const signPreviewCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const signPreviewStageRef = useRef<HTMLDivElement | null>(null);
+  const sigDragRef = useRef<{
+    pointerId: number;
+    startClientX: number;
+    startClientY: number;
+    startXPt: number;
+    startYPt: number;
+    stageWidth: number;
+    stageHeight: number;
+  } | null>(null);
 
   const isPdfInputTool = PDF_FILE_TOOL_SLUGS.has(tool.slug);
   const isImageToPdfTool = IMAGE_TO_PDF_SLUGS.has(tool.slug);
@@ -393,11 +432,178 @@ export function PdfToolsRunner({tool}: Props) {
     setIncludeStampBadge(true);
     setSignScale(1);
     setHasDrawn(false);
+    setDrawnSigDataUrl(null);
+    setUploadSigMeta(null);
+    setSignUploadError(null);
+    setSignPreviewPageCount(0);
+    setSignPreviewPageNum(1);
+    setSignPreviewPageSize(null);
+    setSignPreviewLoading(false);
+    setSignPreviewError(null);
+    setIsDraggingSig(false);
+    sigDragRef.current = null;
     if (sigCanvasRef.current) {
       const ctx = sigCanvasRef.current.getContext('2d');
       if (ctx) ctx.clearRect(0, 0, sigCanvasRef.current.width, sigCanvasRef.current.height);
     }
   }, [tool.slug]);
+
+  // Read uploaded signature image metadata (natural dimensions + dataUrl) for preview parity
+  useEffect(() => {
+    if (tool.slug !== 'sign-pdf' || !signUploadedFile) {
+      setUploadSigMeta(null);
+      setSignUploadError(null);
+      return;
+    }
+
+    let cancelled = false;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (cancelled) return;
+      const dataUrl = typeof reader.result === 'string' ? reader.result : '';
+      if (!dataUrl) {
+        setUploadSigMeta(null);
+        setSignUploadError('Could not read uploaded signature image.');
+        return;
+      }
+      const img = new Image();
+      img.onload = () => {
+        if (cancelled) return;
+        setSignUploadError(null);
+        setUploadSigMeta({
+          dataUrl,
+          width: img.naturalWidth || 400,
+          height: img.naturalHeight || 150,
+        });
+      };
+      img.onerror = () => {
+        if (cancelled) return;
+        setUploadSigMeta(null);
+        setSignUploadError('Invalid signature image file. Please select a valid PNG or JPG.');
+      };
+      img.src = dataUrl;
+    };
+    reader.onerror = () => {
+      if (cancelled) return;
+      setUploadSigMeta(null);
+      setSignUploadError('Failed to read the uploaded signature image.');
+    };
+    reader.readAsDataURL(signUploadedFile);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tool.slug, signUploadedFile]);
+
+  // Render live PDF page preview via pdfjs-dist when Sign PDF has a PDF loaded
+  useEffect(() => {
+    if (tool.slug !== 'sign-pdf') return;
+    const activeFile = files[0];
+    if (!activeFile) {
+      setSignPreviewPageCount(0);
+      setSignPreviewPageNum(1);
+      setSignPreviewPageSize(null);
+      setSignPreviewLoading(false);
+      setSignPreviewError(null);
+      const canvas = signPreviewCanvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      return;
+    }
+
+    let cancelled = false;
+    let renderTask: { cancel: () => void; promise: Promise<void> } | null = null;
+    let loadingTask: { destroy?: () => Promise<void>; promise: Promise<any> } | null = null;
+
+    const renderPagePreview = async () => {
+      setSignPreviewLoading(true);
+      setSignPreviewError(null);
+
+      try {
+        const buf = await activeFile.arrayBuffer();
+        if (cancelled) return;
+
+        loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buf) });
+        const pdfDoc = await loadingTask.promise;
+        if (cancelled) return;
+
+        const totalPages = pdfDoc.numPages;
+        if (!totalPages || totalPages < 1) {
+          throw new Error('This PDF document contains no pages to preview.');
+        }
+
+        const requestedPage = Number.isFinite(signPageNumber) ? Math.floor(signPageNumber) : 1;
+        const clampedPage = Math.min(Math.max(1, requestedPage), totalPages);
+        const page = await pdfDoc.getPage(clampedPage);
+        if (cancelled) return;
+
+        const baseViewport = page.getViewport({ scale: 1 });
+        const renderScale = Math.min(2.2, Math.max(1.25, 900 / Math.max(200, baseViewport.width)));
+        const renderViewport = page.getViewport({ scale: renderScale });
+
+        const canvas = signPreviewCanvasRef.current;
+        if (canvas) {
+          canvas.width = Math.max(1, Math.round(renderViewport.width));
+          canvas.height = Math.max(1, Math.round(renderViewport.height));
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            throw new Error('Browser canvas rendering context is unavailable.');
+          }
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          const task = page.render({ canvasContext: ctx, canvas, viewport: renderViewport });
+          renderTask = task;
+          await task.promise;
+        }
+
+        if (cancelled) return;
+        setPdfPageCount(totalPages);
+        setSignPreviewPageCount(totalPages);
+        setSignPreviewPageNum(clampedPage);
+        setSignPreviewPageSize({
+          width: baseViewport.width,
+          height: baseViewport.height,
+        });
+        setSignPreviewError(null);
+      } catch (err: any) {
+        if (cancelled || err?.name === 'RenderingCancelledException') return;
+        setSignPreviewPageSize(null);
+        setSignPreviewPageCount(0);
+        const canvas = signPreviewCanvasRef.current;
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        const msg =
+          err?.name === 'PasswordException'
+            ? 'Cannot preview a password-protected PDF. Unlock it first with Unlock PDF.'
+            : err?.message || 'Unable to preview this PDF file. Please verify it is a valid, uncorrupted PDF.';
+        setSignPreviewError(msg);
+      } finally {
+        if (!cancelled) {
+          setSignPreviewLoading(false);
+        }
+      }
+    };
+
+    renderPagePreview();
+
+    return () => {
+      cancelled = true;
+      try {
+        renderTask?.cancel();
+      } catch {
+        // ignore cancel error
+      }
+      try {
+        loadingTask?.destroy?.();
+      } catch {
+        // ignore destroy error
+      }
+    };
+  }, [tool.slug, files, signPageNumber]);
 
   const inspectUploadedPdf = async (selectedFiles: File[]) => {
     if (selectedFiles.length > 0 && selectedFiles[0].type === 'application/pdf') {
@@ -490,8 +696,18 @@ export function PdfToolsRunner({tool}: Props) {
     const rect = canvas.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const scaleX = canvas.width / Math.max(1, rect.width);
+    const scaleY = canvas.height / Math.max(1, rect.height);
+    const cx = (clientX - rect.left) * scaleX;
+    const cy = (clientY - rect.top) * scaleY;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#0F172A';
     ctx.beginPath();
-    ctx.moveTo(clientX - rect.left, clientY - rect.top);
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + 0.1, cy + 0.1);
+    ctx.stroke();
   };
 
   const drawSignatureStroke = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -503,15 +719,22 @@ export function PdfToolsRunner({tool}: Props) {
     const rect = canvas.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const scaleX = canvas.width / Math.max(1, rect.width);
+    const scaleY = canvas.height / Math.max(1, rect.height);
+    const cx = (clientX - rect.left) * scaleX;
+    const cy = (clientY - rect.top) * scaleY;
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = '#0F172A';
-    ctx.lineTo(clientX - rect.left, clientY - rect.top);
+    ctx.lineTo(cx, cy);
     ctx.stroke();
   };
 
   const stopDrawing = () => {
+    if (isDrawingRef.current && sigCanvasRef.current) {
+      setDrawnSigDataUrl(sigCanvasRef.current.toDataURL('image/png'));
+    }
     isDrawingRef.current = false;
   };
 
@@ -522,6 +745,166 @@ export function PdfToolsRunner({tool}: Props) {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     setHasDrawn(false);
+    setDrawnSigDataUrl(null);
+  };
+
+  const activeSignaturePreview = useMemo(() => {
+    if (tool.slug !== 'sign-pdf') return null;
+    if (signMode === 'draw') {
+      if (!hasDrawn || !drawnSigDataUrl) return null;
+      return {
+        dataUrl: drawnSigDataUrl,
+        naturalWidth: 400,
+        naturalHeight: 150,
+      };
+    }
+    if (signMode === 'type') {
+      if (!signTypedText.trim() || typeof document === 'undefined') return null;
+      try {
+        return {
+          dataUrl: renderTypedSignatureDataUrl(signTypedText, signTypedStyle),
+          naturalWidth: 440,
+          naturalHeight: 140,
+        };
+      } catch {
+        return null;
+      }
+    }
+    if (signMode === 'upload') {
+      if (!signUploadedFile || !uploadSigMeta) return null;
+      return {
+        dataUrl: uploadSigMeta.dataUrl,
+        naturalWidth: uploadSigMeta.width,
+        naturalHeight: uploadSigMeta.height,
+      };
+    }
+    return null;
+  }, [tool.slug, signMode, hasDrawn, drawnSigDataUrl, signTypedText, signTypedStyle, signUploadedFile, uploadSigMeta]);
+
+  const activePreviewGeometry = useMemo(() => {
+    if (!signPreviewPageSize) return null;
+    const natW = activeSignaturePreview?.naturalWidth ?? 400;
+    const natH = activeSignaturePreview?.naturalHeight ?? 150;
+    const imgSize = computeSignatureImageSizePt(
+      natW,
+      natH,
+      signScale,
+      signPreviewPageSize.width,
+      signPreviewPageSize.height,
+    );
+    const resolved = resolveSignaturePositionPt(
+      signPosition,
+      Number(signCustomX),
+      Number(signCustomY),
+      imgSize.imgWidthPt,
+      imgSize.imgHeightPt,
+      signPreviewPageSize.width,
+      signPreviewPageSize.height,
+      includeStampBadge,
+    );
+    const box = computeSignatureBoxRectPt(
+      resolved.x,
+      resolved.y,
+      imgSize.imgWidthPt,
+      imgSize.imgHeightPt,
+      includeStampBadge,
+    );
+    const overlayPct = signatureBoxToOverlayPct(
+      box,
+      signPreviewPageSize.width,
+      signPreviewPageSize.height,
+    );
+    return {
+      imgSize,
+      resolved,
+      box,
+      overlayPct,
+    };
+  }, [signPreviewPageSize, activeSignaturePreview, signScale, signPosition, signCustomX, signCustomY, includeStampBadge]);
+
+  const handleSelectSignPosition = (nextPosition: SignPositionPreset) => {
+    setSignPosition(nextPosition);
+    if (nextPosition === 'custom') return;
+    const pageW = signPreviewPageSize?.width ?? 612;
+    const pageH = signPreviewPageSize?.height ?? 792;
+    const natW = activeSignaturePreview?.naturalWidth ?? 400;
+    const natH = activeSignaturePreview?.naturalHeight ?? 150;
+    const imgSize = computeSignatureImageSizePt(natW, natH, signScale, pageW, pageH);
+    const resolved = resolveSignaturePositionPt(
+      nextPosition,
+      signCustomX,
+      signCustomY,
+      imgSize.imgWidthPt,
+      imgSize.imgHeightPt,
+      pageW,
+      pageH,
+      includeStampBadge,
+    );
+    setSignCustomX(Math.round(resolved.x));
+    setSignCustomY(Math.round(resolved.y));
+  };
+
+  const handleSigOverlayPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!signPreviewStageRef.current || !activePreviewGeometry) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const stageRect = signPreviewStageRef.current.getBoundingClientRect();
+    if (stageRect.width <= 0 || stageRect.height <= 0) return;
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // ignore if unsupported in synthetic environments
+    }
+
+    sigDragRef.current = {
+      pointerId: e.pointerId,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      startXPt: activePreviewGeometry.resolved.x,
+      startYPt: activePreviewGeometry.resolved.y,
+      stageWidth: stageRect.width,
+      stageHeight: stageRect.height,
+    };
+    setIsDraggingSig(true);
+  };
+
+  const handleSigOverlayPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = sigDragRef.current;
+    if (!drag || drag.pointerId !== e.pointerId || !signPreviewPageSize || !activePreviewGeometry) return;
+    e.preventDefault();
+    const dxPx = e.clientX - drag.startClientX;
+    const dyPx = e.clientY - drag.startClientY;
+    const nextPt = applyPointerDeltaToPositionPt(
+      drag.startXPt,
+      drag.startYPt,
+      dxPx,
+      dyPx,
+      drag.stageWidth,
+      drag.stageHeight,
+      activePreviewGeometry.imgSize.imgWidthPt,
+      activePreviewGeometry.imgSize.imgHeightPt,
+      signPreviewPageSize.width,
+      signPreviewPageSize.height,
+      includeStampBadge,
+    );
+    setSignPosition('custom');
+    setSignCustomX(nextPt.x);
+    setSignCustomY(nextPt.y);
+  };
+
+  const handleSigOverlayPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = sigDragRef.current;
+    if (!drag || drag.pointerId !== e.pointerId) return;
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore
+    }
+    sigDragRef.current = null;
+    setIsDraggingSig(false);
   };
 
   const handleLoadSamplePdf = async () => {
@@ -743,31 +1126,7 @@ export function PdfToolsRunner({tool}: Props) {
           if (!signTypedText.trim()) {
             throw new Error('Please enter your name for the typed signature.');
           }
-          const c = document.createElement('canvas');
-          c.width = 440;
-          c.height = 140;
-          const ctx = c.getContext('2d');
-          if (!ctx) throw new Error('Canvas unavailable.');
-          ctx.fillStyle = 'rgba(0,0,0,0)';
-          ctx.fillRect(0, 0, c.width, c.height);
-          ctx.fillStyle = '#0F172A';
-          if (signTypedStyle === 'brush') {
-            ctx.font = 'italic bold 44px "Brush Script MT", cursive, serif';
-          } else if (signTypedStyle === 'formal') {
-            ctx.font = 'italic 38px "Georgia", "Times New Roman", serif';
-          } else {
-            ctx.font = 'italic 46px "Caveat", "Dancing Script", "Segoe Script", cursive';
-          }
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(signTypedText.trim(), 220, 65);
-          ctx.strokeStyle = '#0A8CFF';
-          ctx.lineWidth = 2.5;
-          ctx.beginPath();
-          ctx.moveTo(50, 105);
-          ctx.bezierCurveTo(160, 120, 280, 92, 390, 108);
-          ctx.stroke();
-          sigDataUrl = c.toDataURL('image/png');
+          sigDataUrl = renderTypedSignatureDataUrl(signTypedText, signTypedStyle);
         } else if (signMode === 'upload') {
           if (!signUploadedFile) {
             throw new Error('Please select a PNG or JPG signature image file to upload.');
@@ -802,23 +1161,24 @@ export function PdfToolsRunner({tool}: Props) {
         }
 
         const scaleVal = signScale || 1;
-        const imgDims = embeddedImg.scale(0.35 * scaleVal);
-        let x = pageWidth - imgDims.width - 40;
-        let y = 40;
-
-        if (signPosition === 'bottom-left') {
-          x = 40;
-          y = 40;
-        } else if (signPosition === 'bottom-center') {
-          x = (pageWidth - imgDims.width) / 2;
-          y = 40;
-        } else if (signPosition === 'top-right') {
-          x = pageWidth - imgDims.width - 40;
-          y = pageHeight - imgDims.height - 40;
-        } else if (signPosition === 'custom') {
-          x = Number(signCustomX) || 40;
-          y = Number(signCustomY) || 40;
-        }
+        const { effectiveScale } = computeSignatureImageSizePt(
+          embeddedImg.width,
+          embeddedImg.height,
+          scaleVal,
+          pageWidth,
+          pageHeight,
+        );
+        const imgDims = embeddedImg.scale(effectiveScale);
+        const { x, y } = resolveSignaturePositionPt(
+          signPosition,
+          Number(signCustomX),
+          Number(signCustomY),
+          imgDims.width,
+          imgDims.height,
+          pageWidth,
+          pageHeight,
+          includeStampBadge,
+        );
 
         if (includeStampBadge) {
           targetPage.drawRectangle({
@@ -1685,7 +2045,7 @@ export function PdfToolsRunner({tool}: Props) {
           </div>
 
           <div className="flex items-center justify-center w-full">
-            <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-xl cursor-pointer bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900 hover:bg-slate-100 transition-colors">
+            <label className="relative flex flex-col items-center justify-center w-full h-36 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-xl cursor-pointer bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-900 hover:bg-slate-100 transition-colors">
               <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
                 <Upload className="w-8 h-8 mb-2 text-slate-400" />
                 <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
@@ -1700,7 +2060,7 @@ export function PdfToolsRunner({tool}: Props) {
                 multiple={isMultiple}
                 accept={acceptAttr}
                 onChange={handleFileChange}
-                className="hidden"
+                className="absolute inset-0 h-full w-full opacity-0 cursor-pointer"
               />
             </label>
           </div>
@@ -2146,8 +2506,8 @@ export function PdfToolsRunner({tool}: Props) {
         )}
 
         {tool.slug === 'sign-pdf' && (
-          <div className="space-y-4 p-5 rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
-            <div className="flex items-center justify-between">
+          <div className="space-y-4 p-4 sm:p-5 rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/20">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-xs font-bold text-amber-950 dark:text-amber-200">
                 <PenTool className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                 <span>Create Visible Signature</span>
@@ -2219,7 +2579,7 @@ export function PdfToolsRunner({tool}: Props) {
                 </div>
                 {hasDrawn && (
                   <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-                    Signature drawn and ready to stamp!
+                    Signature drawn and ready! Drag it directly on the PDF preview below.
                   </p>
                 )}
               </div>
@@ -2288,7 +2648,12 @@ export function PdfToolsRunner({tool}: Props) {
                   onChange={(e) => setSignUploadedFile(e.target.files?.[0] || null)}
                   className="block w-full text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-amber-700"
                 />
-                {signUploadedFile && (
+                {signUploadError && (
+                  <p className="text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+                    {signUploadError}
+                  </p>
+                )}
+                {signUploadedFile && !signUploadError && (
                   <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
                     Selected: {signUploadedFile.name} ({(signUploadedFile.size / 1024).toFixed(1)} KB)
                   </p>
@@ -2296,9 +2661,243 @@ export function PdfToolsRunner({tool}: Props) {
               </div>
             )}
 
+            {/* Interactive PDF Page Preview + Touch/Mouse Draggable Signature Overlay */}
+            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                    <Eye className="h-3.5 w-3.5 text-[#0A8CFF]" />
+                    <span>PDF Page Preview &amp; Drag Placement</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                    {signPreviewPageSize
+                      ? `Page ${signPreviewPageNum} of ${signPreviewPageCount} — ${Math.round(signPreviewPageSize.width)} × ${Math.round(signPreviewPageSize.height)} pt`
+                      : 'Upload a PDF or click Try sample PDF to preview and place your signature.'}
+                  </p>
+                </div>
+
+                {signPreviewPageCount > 1 && (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setSignPageNumber((p) => Math.max(1, p - 1))}
+                      disabled={signPreviewPageNum <= 1}
+                      aria-label="Previous PDF page"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium text-slate-700 dark:text-slate-200 disabled:opacity-40 cursor-pointer"
+                    >
+                      <ChevronLeft className="h-3.5 w-3.5" />
+                      <span>Prev</span>
+                    </button>
+                    <span className="text-xs font-mono text-slate-600 dark:text-slate-300 px-1">
+                      {signPreviewPageNum}/{signPreviewPageCount}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSignPageNumber((p) => Math.min(signPreviewPageCount, p + 1))
+                      }
+                      disabled={signPreviewPageNum >= signPreviewPageCount}
+                      aria-label="Next PDF page"
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium text-slate-700 dark:text-slate-200 disabled:opacity-40 cursor-pointer"
+                    >
+                      <span>Next</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {files.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-white/80 dark:bg-slate-900/70 p-6 text-center text-xs text-slate-500 dark:text-slate-400">
+                  Upload a PDF document above (or click <strong>Try sample PDF</strong>) to view page {signPageNumber} and drag your signature with touch or mouse.
+                </div>
+              ) : signPreviewError ? (
+                <div
+                  role="alert"
+                  className="rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 p-4 text-xs text-rose-700 dark:text-rose-300 flex items-start gap-2"
+                >
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-semibold">PDF Preview Unavailable</div>
+                    <p className="mt-0.5">{signPreviewError}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {signPreviewPageSize && !activeSignaturePreview && (
+                    <div className="rounded-lg border border-sky-200 dark:border-sky-800 bg-sky-50/90 dark:bg-sky-950/40 px-3 py-2 text-[11px] text-sky-900 dark:text-sky-200">
+                      {signMode === 'draw'
+                        ? 'Draw your signature above to place and drag it onto this page.'
+                        : signMode === 'type'
+                          ? 'Type your signature name above to place and drag it onto this page.'
+                          : 'Upload a PNG or JPG signature image above to place and drag it onto this page.'}
+                    </div>
+                  )}
+
+                  {signPreviewPageSize && activeSignaturePreview && activePreviewGeometry && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
+                      <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200">
+                        <Move className="h-3.5 w-3.5 text-[#0A8CFF]" />
+                        <span>Drag signature with touch or mouse to place anywhere on the page</span>
+                      </span>
+                      <span
+                        data-testid="sign-live-coords"
+                        className="font-mono font-semibold text-[#0A8CFF]"
+                      >
+                        X: {Math.round(activePreviewGeometry.resolved.x)} pt · Y: {Math.round(activePreviewGeometry.resolved.y)} pt
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="w-full max-w-full overflow-hidden rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-200/70 dark:bg-slate-950 p-2 sm:p-4">
+                    <div
+                      ref={signPreviewStageRef}
+                      data-testid="sign-pdf-preview-stage"
+                      className="relative mx-auto w-full max-w-[640px] bg-white shadow-md rounded-sm overflow-hidden select-none"
+                      style={
+                        signPreviewPageSize
+                          ? { aspectRatio: `${signPreviewPageSize.width} / ${signPreviewPageSize.height}` }
+                          : { minHeight: '260px' }
+                      }
+                    >
+                      <canvas
+                        ref={signPreviewCanvasRef}
+                        data-testid="sign-pdf-preview-canvas"
+                        className="block w-full h-auto pointer-events-none"
+                      />
+
+                      {signPreviewLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-slate-950/75 text-xs font-medium text-slate-600 dark:text-slate-300">
+                          <Loader2 className="h-4 w-4 animate-spin mr-2 text-[#0A8CFF]" />
+                          <span>Rendering PDF page preview...</span>
+                        </div>
+                      )}
+
+                      {!signPreviewLoading &&
+                        signPreviewPageSize &&
+                        activeSignaturePreview &&
+                        activePreviewGeometry && (
+                          <div
+                            role="slider"
+                            tabIndex={0}
+                            aria-label="Draggable signature placement overlay"
+                            aria-valuetext={`X ${Math.round(activePreviewGeometry.resolved.x)} pt, Y ${Math.round(activePreviewGeometry.resolved.y)} pt`}
+                            data-testid="sign-signature-overlay"
+                            onPointerDown={handleSigOverlayPointerDown}
+                            onPointerMove={handleSigOverlayPointerMove}
+                            onPointerUp={handleSigOverlayPointerUp}
+                            onPointerCancel={handleSigOverlayPointerUp}
+                            onKeyDown={(e) => {
+                              const step = e.shiftKey ? 20 : 5;
+                              let dx = 0;
+                              let dy = 0;
+                              if (e.key === 'ArrowLeft') dx = -step;
+                              else if (e.key === 'ArrowRight') dx = step;
+                              else if (e.key === 'ArrowUp') dy = step;
+                              else if (e.key === 'ArrowDown') dy = -step;
+                              else return;
+                              e.preventDefault();
+                              setSignPosition('custom');
+                              setSignCustomX(Math.max(0, Math.round(activePreviewGeometry.resolved.x + dx)));
+                              setSignCustomY(Math.max(0, Math.round(activePreviewGeometry.resolved.y + dy)));
+                            }}
+                            style={{
+                              touchAction: 'none',
+                              left: `${activePreviewGeometry.overlayPct.leftPct}%`,
+                              top: `${activePreviewGeometry.overlayPct.topPct}%`,
+                              width: `${activePreviewGeometry.overlayPct.widthPct}%`,
+                              height: `${activePreviewGeometry.overlayPct.heightPct}%`,
+                            }}
+                            className={`absolute cursor-grab active:cursor-grabbing select-none transition-shadow ${
+                              isDraggingSig
+                                ? 'ring-2 ring-[#0A8CFF] shadow-xl z-20'
+                                : 'hover:ring-2 hover:ring-[#0A8CFF]/80 z-10'
+                            } ${
+                              includeStampBadge
+                                ? 'bg-[#F7FAFF]/95 border border-[#0A8CFF]'
+                                : 'border border-dashed border-[#0A8CFF]/75 bg-white/25'
+                            }`}
+                          >
+                            {isDraggingSig && (
+                              <div className="pointer-events-none absolute -top-6 left-0 whitespace-nowrap rounded bg-slate-900/90 px-1.5 py-0.5 text-[10px] font-mono text-white shadow">
+                                X:{Math.round(activePreviewGeometry.resolved.x)} Y:{Math.round(activePreviewGeometry.resolved.y)} pt
+                              </div>
+                            )}
+
+                            {includeStampBadge ? (
+                              <div className="relative h-full w-full overflow-hidden">
+                                <img
+                                  src={activeSignaturePreview.dataUrl}
+                                  alt="Draggable signature preview"
+                                  draggable={false}
+                                  style={{
+                                    left: `${(activePreviewGeometry.box.leftPadPt / activePreviewGeometry.box.outerWidthPt) * 100}%`,
+                                    top: `${(13 / activePreviewGeometry.box.outerHeightPt) * 100}%`,
+                                    width: `${(activePreviewGeometry.box.imgWidthPt / activePreviewGeometry.box.outerWidthPt) * 100}%`,
+                                    height: `${(activePreviewGeometry.box.imgHeightPt / activePreviewGeometry.box.outerHeightPt) * 100}%`,
+                                  }}
+                                  className="absolute object-contain pointer-events-none select-none"
+                                />
+                                <div
+                                  style={{
+                                    left: `${(activePreviewGeometry.box.leftPadPt / activePreviewGeometry.box.outerWidthPt) * 100}%`,
+                                    right: `${(activePreviewGeometry.box.rightPadPt / activePreviewGeometry.box.outerWidthPt) * 100}%`,
+                                    bottom: `${(2 / activePreviewGeometry.box.outerHeightPt) * 100}%`,
+                                  }}
+                                  className="absolute pointer-events-none leading-tight overflow-hidden"
+                                >
+                                  <div className="truncate text-[9px] sm:text-[10px] font-bold text-slate-900">
+                                    Signed by: {signerName.trim() || 'Verified Signer'}
+                                  </div>
+                                  <div className="truncate text-[8px] sm:text-[9px] text-slate-600">
+                                    Date: {signDate.trim() || new Date().toISOString().split('T')[0]}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <img
+                                src={activeSignaturePreview.dataUrl}
+                                alt="Draggable signature preview"
+                                draggable={false}
+                                className="h-full w-full object-contain pointer-events-none select-none"
+                              />
+                            )}
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
               <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                Placement & Details
+                Placement &amp; Details
+              </div>
+
+              <div className="flex flex-wrap gap-1.5">
+                {(
+                  [
+                    { id: 'bottom-right', label: 'Bottom Right' },
+                    { id: 'bottom-left', label: 'Bottom Left' },
+                    { id: 'bottom-center', label: 'Bottom Center' },
+                    { id: 'top-right', label: 'Top Right' },
+                    { id: 'custom', label: 'Custom' },
+                  ] as const
+                ).map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => handleSelectSignPosition(preset.id)}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${
+                      signPosition === preset.id
+                        ? 'bg-[#0A8CFF] text-white border-[#0A8CFF]'
+                        : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-[#0A8CFF]'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -2322,7 +2921,7 @@ export function PdfToolsRunner({tool}: Props) {
                   </label>
                   <select
                     value={signPosition}
-                    onChange={(e) => setSignPosition(e.target.value as any)}
+                    onChange={(e) => handleSelectSignPosition(e.target.value as SignPositionPreset)}
                     className="w-full rounded-xl border border-slate-300 dark:border-slate-700 p-2.5 text-xs bg-white dark:bg-slate-900"
                   >
                     <option value="bottom-right">Bottom Right Corner</option>
@@ -2347,37 +2946,57 @@ export function PdfToolsRunner({tool}: Props) {
                 </div>
               </div>
 
-              {signPosition === 'custom' && (
-                <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-800/50">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      X Coordinate (pt from left)
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={signCustomX}
-                      onChange={(e) => setSignCustomX(Number(e.target.value) || 0)}
-                      className="w-full rounded-lg border border-slate-300 dark:border-slate-700 p-2 text-xs bg-white dark:bg-slate-900"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Y Coordinate (pt from bottom)
-                    </label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={signCustomY}
-                      onChange={(e) => setSignCustomY(Number(e.target.value) || 0)}
-                      className="w-full rounded-lg border border-slate-300 dark:border-slate-700 p-2 text-xs bg-white dark:bg-slate-900"
-                    />
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-xl bg-slate-100/90 dark:bg-slate-800/50">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    X Coordinate (pt from left)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={signPosition === 'custom' ? signCustomX : Math.round(activePreviewGeometry?.resolved.x ?? signCustomX)}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setSignPosition('custom');
+                      setSignCustomX(Number.isFinite(val) ? Math.max(0, Math.round(val)) : 0);
+                    }}
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 p-2 text-xs bg-white dark:bg-slate-900"
+                  />
                 </div>
-              )}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Y Coordinate (pt from bottom)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={signPosition === 'custom' ? signCustomY : Math.round(activePreviewGeometry?.resolved.y ?? signCustomY)}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setSignPosition('custom');
+                      setSignCustomY(Number.isFinite(val) ? Math.max(0, Math.round(val)) : 0);
+                    }}
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 p-2 text-xs bg-white dark:bg-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Signature Scale: {Math.round(signScale * 100)}%
+                  </label>
+                  <input
+                    type="range"
+                    min={0.5}
+                    max={2}
+                    step={0.05}
+                    value={signScale}
+                    onChange={(e) => setSignScale(Number(e.target.value))}
+                    className="w-full mt-2"
+                  />
+                </div>
+              </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                <div>
+                <div className="w-full sm:w-auto">
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Signer Name on Badge
                   </label>
@@ -2386,18 +3005,18 @@ export function PdfToolsRunner({tool}: Props) {
                     value={signerName}
                     onChange={(e) => setSignerName(e.target.value)}
                     placeholder="e.g. Jane Doe"
-                    className="w-56 rounded-xl border border-slate-300 dark:border-slate-700 p-2 text-xs bg-white dark:bg-slate-900"
+                    className="w-full sm:w-56 rounded-xl border border-slate-300 dark:border-slate-700 p-2 text-xs bg-white dark:bg-slate-900"
                   />
                 </div>
 
-                <label className="inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer pt-4">
+                <label className="inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer sm:pt-4">
                   <input
                     type="checkbox"
                     checked={includeStampBadge}
                     onChange={(e) => setIncludeStampBadge(e.target.checked)}
                     className="rounded border-slate-300 text-[#0A8CFF]"
                   />
-                  <span>Include visual verification stamp border & signer details</span>
+                  <span>Include visual verification stamp border &amp; signer details</span>
                 </label>
               </div>
             </div>
