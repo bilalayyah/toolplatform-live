@@ -64,7 +64,7 @@ export function DeveloperToolsRunner({tool}: Props) {
 // Verification check: turns {"a":1} into pretty-printed JSON
 // =========================================================================
 function JsonFormatter({onCopy, copiedKey}: {onCopy: (t: string, k: string) => void; copiedKey: string | null}) {
-  const [inputJson, setInputJson] = useState<string>('{"name":"ToolPlatform","tools":172,"active":true,"categories":["PDF","Image","Developer","Finance"]}');
+  const [inputJson, setInputJson] = useState<string>('{"name":"ToolPlatform","tools":171,"active":true,"categories":["PDF","Image","Developer","Finance"]}');
   const [indent, setIndent] = useState<number>(2);
   const [outputJson, setOutputJson] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);

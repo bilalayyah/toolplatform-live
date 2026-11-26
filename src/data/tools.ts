@@ -97,12 +97,12 @@ export const CATEGORIES: readonly ToolCategory[] = [
     icon: 'FileText',
     seoTitle: `PDF Tools — Online PDF Utilities | ${SITE_CONFIG.siteName}`,
     seoDescription:
-      'Explore 34 PDF tools including Merge PDF, Split PDF, PDF Editor, PDF to Excel, and Compress PDF in one clean workspace.',
+      'Explore 33 PDF tools including Merge PDF, Split PDF, PDF to Excel, and Compress PDF in one clean workspace.',
     faqs: [
       {
         question: 'Are the PDF tools live and accepting uploads right now?',
         answer:
-          'Yes! Core PDF tools including Merge, Split, Compress, Rotate, PDF to JPG/PNG, PDF Editor, PDF to Word, PDF to Excel, Excel to PDF, and Text/Word to PDF are now fully functional in your browser. Advanced cryptographic security features such as Sign PDF, Unlock PDF, and Protect PDF remain Coming Soon in Phase 3.',
+          'Yes! Core PDF tools including Merge, Split, Compress, Rotate, PDF to JPG/PNG, PDF to Word, PDF to Excel, Excel to PDF, and Text/Word to PDF are now fully functional in your browser. Advanced cryptographic security features such as Sign PDF, Unlock PDF, and Protect PDF remain Coming Soon in Phase 3.',
       },
       {
         question: 'Are PDF files processed in my browser or on a server?',
@@ -583,7 +583,7 @@ export const CATEGORIES: readonly ToolCategory[] = [
       {
         question: 'Why are there no tools listed under File Tools yet?',
         answer:
-          'We are launching the platform in focused stages. Our initial 172 planned tools span PDF, Image, Video, Converter, Productivity, Unit Converters, Number Systems, Lookup, Science, Generators, Developer, Document, and Finance Tools, while File Tools utilities are scheduled for a later phase.',
+          'We are launching the platform in focused stages. Our initial 171 planned tools span PDF, Image, Video, Converter, Productivity, Unit Converters, Number Systems, Lookup, Science, Generators, Developer, Document, and Finance Tools, while File Tools utilities are scheduled for a later phase.',
       },
       {
         question: 'What kind of utilities are planned for File Tools?',
@@ -620,7 +620,7 @@ export const CATEGORIES: readonly ToolCategory[] = [
       {
         question: 'Are any Web Tools available to preview right now?',
         answer:
-          'Not yet. This category is part of our 15-category architecture and will be populated after the initial 172 tools across our active suites are rolled out.',
+          'Not yet. This category is part of our 15-category architecture and will be populated after the initial 171 tools across our active suites are rolled out.',
       },
       {
         question: 'What tools are planned for the Web Tools category?',
@@ -633,7 +633,7 @@ export const CATEGORIES: readonly ToolCategory[] = [
           'No. Standard formatting and encoding utilities are planned to run locally in your browser with zero login required.',
       },
       {
-        question: 'Where can I browse the 172 tools already in the catalog?',
+        question: 'Where can I browse the 171 tools already in the catalog?',
         answer:
           'You can browse every currently cataloged tool on the All Tools directory page or explore all populated categories across media, productivity, unit converter, number system, lookup, science, generator, developer, document, and finance suites.',
       },
@@ -643,7 +643,7 @@ export const CATEGORIES: readonly ToolCategory[] = [
 
 export const TOOLS: readonly Tool[] = [
   // ========================
-  // PDF TOOLS (34)
+  // PDF TOOLS (33)
   // ========================
   {
     id: 'merge-pdf',
@@ -1411,76 +1411,6 @@ export const TOOLS: readonly Tool[] = [
     status: 'active',
   },
   {
-    id: 'pdf-editor',
-    name: 'PDF Editor',
-    slug: 'pdf-editor',
-    category: 'pdf-tools',
-    url: '/pdf-editor',
-    description: 'Add text, highlights, freehand drawings, images, and annotations to PDFs.',
-    longDescription:
-      'Need to fill out a form, mark up a contract, or drop a logo onto a PDF page? PDF Editor runs directly in your browser so you can add text, highlight regions, draw annotations, or stamp images onto pages. Note: Existing PDF text cannot be edited like Word — text does not reflow.',
-    keywords: [
-      'pdf editor',
-      'edit pdf',
-      'annotate pdf',
-      'add text to pdf',
-      'draw on pdf',
-      'markup pdf',
-    ],
-    icon: 'SquarePen',
-    acceptedFormats: ['PDF'],
-    maxFileSizeMB: 50,
-    maxFiles: 1,
-    processingMethod: 'browser',
-    seoTitle: `PDF Editor — Annotate & Mark Up PDFs | ${SITE_CONFIG.siteName}`,
-    seoDescription:
-      'PDF Editor lets you add text, highlight, add images, and annotate PDFs up to 50 MB directly in your browser.',
-    howTo: [
-      {
-        title: 'Open a PDF document',
-        description:
-          'Load a PDF up to 50 MB inside your browser (or click Try sample PDF) without uploading it.',
-      },
-      {
-        title: 'Add overlays and markups',
-        description:
-          'Enter new text boxes, toggle highlight overlays, or optionally attach an image stamp on your chosen page.',
-      },
-      {
-        title: 'Export the updated PDF',
-        description:
-          'Your browser embeds your annotations cleanly into a downloadable PDF.',
-      },
-    ],
-    faqs: [
-      {
-        question: 'Can I edit existing PDF paragraphs so text reflows like Microsoft Word?',
-        answer:
-          'No. Existing PDF text cannot be edited like Word — text does not reflow. PDF Editor adds text, highlights, image overlays, and annotations over pages.',
-      },
-      {
-        question: 'Does PDF Editor upload my files to a remote server?',
-        answer:
-          'No. All editing overlays and rendering run locally inside your web browser.',
-      },
-      {
-        question: 'What is the maximum PDF file size?',
-        answer:
-          'PDF Editor supports PDF documents up to 50 MB per file.',
-      },
-      {
-        question: 'What if I need to change underlying paragraphs directly?',
-        answer:
-          'Use PDF to Word to convert the file into an editable DOCX document first.',
-      },
-    ],
-    relatedTools: ['add-text-to-pdf', 'annotate-pdf', 'sign-pdf', 'pdf-to-word'],
-    popular: false,
-    featured: false,
-    rating: null,
-    status: 'active',
-  },
-  {
     id: 'pdf-to-excel',
     name: 'PDF to Excel',
     slug: 'pdf-to-excel',
@@ -2159,7 +2089,7 @@ export const TOOLS: readonly Tool[] = [
           'Use IMAGES to PDF for fast multi-photo page bundling.',
       },
     ],
-    relatedTools: ['images-to-pdf', 'pdf-editor', 'add-text-to-pdf', 'merge-pdf'],
+    relatedTools: ['images-to-pdf', 'add-text-to-pdf', 'merge-pdf', 'annotate-pdf'],
     popular: false,
     featured: false,
     rating: null,
@@ -2553,7 +2483,7 @@ export const TOOLS: readonly Tool[] = [
       {
         question: 'Can Add Text to PDF edit existing locked paragraphs?',
         answer:
-          'It adds new text overlays onto pages; existing PDF text cannot be edited or reflowed like Word. For broader markup, see PDF Editor.',
+          'It adds new text overlays onto pages; existing PDF text cannot be edited or reflowed like Word. For broader markup, see Annotate PDF.',
       },
       {
         question: 'Does added text stay crisp when printed?',
@@ -2571,7 +2501,7 @@ export const TOOLS: readonly Tool[] = [
           'Yes. Text placement runs locally in your browser with no remote uploads.',
       },
     ],
-    relatedTools: ['pdf-editor', 'annotate-pdf', 'sign-pdf', 'add-numbers-to-pdf'],
+    relatedTools: ['annotate-pdf', 'sign-pdf', 'add-numbers-to-pdf', 'add-watermark-to-pdf'],
     popular: false,
     featured: false,
     rating: null,
@@ -2625,11 +2555,6 @@ export const TOOLS: readonly Tool[] = [
           'Annotate PDF lets you place custom text notes, choose target pages and positions, and add yellow highlight bars.',
       },
       {
-        question: 'How is Annotate PDF different from PDF Editor?',
-        answer:
-          'Annotate PDF streamlines review highlights and notes, while PDF Editor also supports attaching custom image stamps.',
-      },
-      {
         question: 'What is the file size limit?',
         answer:
           'Annotate PDF supports PDF documents up to 50 MB.',
@@ -2640,7 +2565,7 @@ export const TOOLS: readonly Tool[] = [
           'Yes. Markup processing stays 100% in your browser.',
       },
     ],
-    relatedTools: ['pdf-editor', 'add-text-to-pdf', 'sign-pdf', 'add-watermark-to-pdf'],
+    relatedTools: ['add-text-to-pdf', 'sign-pdf', 'add-watermark-to-pdf', 'merge-pdf'],
     popular: false,
     featured: false,
     rating: null,

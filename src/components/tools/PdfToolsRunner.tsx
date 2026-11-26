@@ -72,7 +72,6 @@ const PDF_FILE_TOOL_SLUGS = new Set([
   'pdf-to-excel',
   'pdf-to-powerpoint',
   'pdf-to-csv',
-  'pdf-editor',
   'crop-pdf',
   'pdf-page-deleter',
   'rearrange-pdf',
@@ -311,7 +310,6 @@ export function PdfToolsRunner({tool}: Props) {
   const [fontSize, setFontSize] = useState<number>(18);
   const [textPosition, setTextPosition] = useState<'top' | 'middle' | 'bottom'>('top');
   const [addHighlight, setAddHighlight] = useState<boolean>(true);
-  const [editorImageFile, setEditorImageFile] = useState<File | null>(null);
 
   // Phase 3: Unlock PDF State
   const [unlockPassword, setUnlockPassword] = useState<string>('');
@@ -408,7 +406,6 @@ export function PdfToolsRunner({tool}: Props) {
     setFontSize(18);
     setTextPosition('top');
     setAddHighlight(true);
-    setEditorImageFile(null);
     setUnlockPassword('');
     setShowUnlockPassword(false);
     setProtectUserPassword('');
@@ -1408,7 +1405,7 @@ export function PdfToolsRunner({tool}: Props) {
         setOutputUrl(URL.createObjectURL(blob));
         setOutputFileName('watermarked_document.pdf');
         setSuccessMessage(`Stamped custom watermark across ${pages.length} page(s).`);
-      } else if (slug === 'add-text-to-pdf' || slug === 'pdf-editor' || slug === 'annotate-pdf') {
+      } else if (slug === 'add-text-to-pdf' || slug === 'annotate-pdf') {
         const file = files[0];
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await PDFDocument.load(arrayBuffer);
@@ -1424,7 +1421,7 @@ export function PdfToolsRunner({tool}: Props) {
               ? height / 2
               : 70;
 
-        if ((slug === 'annotate-pdf' || slug === 'pdf-editor') && addHighlight) {
+        if (slug === 'annotate-pdf' && addHighlight) {
           targetPage.drawRectangle({
             x: 46,
             y: yPos - 6,
@@ -1442,18 +1439,6 @@ export function PdfToolsRunner({tool}: Props) {
             size: fontSize,
             font,
             color: slug === 'annotate-pdf' ? rgb(0.1, 0.1, 0.15) : rgb(0.04, 0.45, 0.88),
-          });
-        }
-
-        if (slug === 'pdf-editor' && editorImageFile) {
-          const imgPngBytes = await imageFileToPngBytes(editorImageFile);
-          const embedded = await pdf.embedPng(imgPngBytes);
-          const dims = embedded.scaleToFit(140, 140);
-          targetPage.drawImage(embedded, {
-            x: 52,
-            y: Math.max(40, yPos - dims.height - 16),
-            width: dims.width,
-            height: dims.height,
           });
         }
 
@@ -1950,12 +1935,6 @@ export function PdfToolsRunner({tool}: Props) {
           </div>
         )}
 
-        {tool.slug === 'pdf-editor' && (
-          <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200">
-            <strong>Editing scope notice:</strong> Existing PDF text cannot be edited like Word — text does not reflow. You can add new text, highlights, image stamps, and annotations onto a page.
-          </div>
-        )}
-
         {tool.slug === 'create-pdf' && (
           <div className="space-y-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -2262,9 +2241,7 @@ export function PdfToolsRunner({tool}: Props) {
           </div>
         )}
 
-        {(tool.slug === 'add-text-to-pdf' ||
-          tool.slug === 'pdf-editor' ||
-          tool.slug === 'annotate-pdf') && (
+        {(tool.slug === 'add-text-to-pdf' || tool.slug === 'annotate-pdf') && (
           <div className="space-y-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/30">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -2318,7 +2295,7 @@ export function PdfToolsRunner({tool}: Props) {
                   className="w-full"
                 />
               </div>
-              {(tool.slug === 'annotate-pdf' || tool.slug === 'pdf-editor') && (
+              {tool.slug === 'annotate-pdf' && (
                 <label className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
                   <input
                     type="checkbox"
@@ -2330,20 +2307,6 @@ export function PdfToolsRunner({tool}: Props) {
                 </label>
               )}
             </div>
-
-            {tool.slug === 'pdf-editor' && (
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                  Optional Image / Stamp Overlay (PNG or JPG)
-                </label>
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg"
-                  onChange={(e) => setEditorImageFile(e.target.files?.[0] || null)}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-sky-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-[#0A8CFF]"
-                />
-              </div>
-            )}
           </div>
         )}
 

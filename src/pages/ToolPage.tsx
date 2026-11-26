@@ -65,8 +65,6 @@ const SPECIAL_DISCLOSURES: Record<string, string> = {
     'Authorization notice: Unlock PDF will strictly require the valid existing password. There will be no password cracking, brute-forcing, or security bypass.',
   'protect-pdf':
     'Permissions notice: While an open password encrypts the file, PDF permission flags (printing, copying, editing) are advisory and depend on viewer software respecting them.',
-  'pdf-editor':
-    'Editing scope notice: Existing PDF text cannot be edited like Word — text does not reflow. You can add text, highlight, draw, place images, and annotate pages.',
   'pdf-to-excel':
     'Table detection notice: Table detection is imperfect on complex layouts, merged cells, or nested grids.',
   'pdf-to-powerpoint':
