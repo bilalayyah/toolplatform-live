@@ -673,15 +673,20 @@ export function PdfToolsRunner({tool}: Props) {
       const rawSample = await createSampleThreePagePdf('Encrypted Test Document', 'sample-protected.pdf');
       const arrayBuffer = await rawSample.arrayBuffer();
       const pdfBytes = new Uint8Array(arrayBuffer);
-      const res = await protectPdfBrowser(pdfBytes, 'test123', undefined, undefined, (status) => setSuccessMessage(status));
+      const res = await protectPdfBrowser(pdfBytes, 'test123', undefined, undefined, (status) =>
+        setSuccessMessage(status || null),
+      );
       const encryptedFile = new File([res.bytes as unknown as BlobPart], 'sample-protected.pdf', {
         type: 'application/pdf',
       });
       setFiles([encryptedFile]);
       setPdfPageCount(res.pageCount || 3);
       setUnlockPassword('test123');
+      setErrorMessage(null);
       setSuccessMessage('Loaded 3-page sample encrypted PDF (password: test123). Click Run to decrypt.');
     } catch (err: any) {
+      console.error(err, err?.cause ? {cause: err.cause} : undefined);
+      setSuccessMessage(null);
       setErrorMessage(err?.message || 'Could not load sample protected PDF.');
     }
   };
@@ -1094,12 +1099,13 @@ export function PdfToolsRunner({tool}: Props) {
             extract: protectExtractPerm,
             annotate: protectAnnotatePerm,
           },
-          (status) => setSuccessMessage(status)
+          (status) => setSuccessMessage(status || null)
         );
         const blob = new Blob([res.bytes as unknown as BlobPart], {type: 'application/pdf'});
         setOutputUrl(URL.createObjectURL(blob));
         const cleanName = file.name.replace(/\.pdf$/i, '');
         setOutputFileName(`${cleanName}_protected.pdf`);
+        setErrorMessage(null);
         setSuccessMessage('PDF protected successfully with AES-256 encryption via browser qpdf-wasm.');
       } else if (slug === 'unlock-pdf') {
         if (!unlockPassword) {
@@ -1108,11 +1114,12 @@ export function PdfToolsRunner({tool}: Props) {
         const file = files[0];
         const arrayBuffer = await file.arrayBuffer();
         const pdfBytes = new Uint8Array(arrayBuffer);
-        const res = await unlockPdfBrowser(pdfBytes, unlockPassword, (status) => setSuccessMessage(status));
+        const res = await unlockPdfBrowser(pdfBytes, unlockPassword, (status) => setSuccessMessage(status || null));
         const blob = new Blob([res.bytes as unknown as BlobPart], {type: 'application/pdf'});
         setOutputUrl(URL.createObjectURL(blob));
         const cleanName = file.name.replace(/\.pdf$/i, '');
         setOutputFileName(`${cleanName}_unlocked.pdf`);
+        setErrorMessage(null);
         setSuccessMessage('PDF decrypted and unlocked successfully via browser qpdf-wasm.');
       } else if (slug === 'sign-pdf') {
         let sigDataUrl = '';
@@ -1818,7 +1825,8 @@ export function PdfToolsRunner({tool}: Props) {
         setSuccessMessage(`Converted ${files.length} image(s) into a ${pdfDoc.getPageCount()}-page PDF!`);
       }
     } catch (err: any) {
-      console.error(err);
+      console.error(err, err?.cause ? {cause: err.cause} : undefined);
+      setSuccessMessage(null);
       setErrorMessage(err?.message || 'Error processing file.');
     } finally {
       setProcessing(false);

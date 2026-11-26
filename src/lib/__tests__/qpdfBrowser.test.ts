@@ -1,6 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
-import { protectPdfBrowser, unlockPdfBrowser, inspectPdfBrowser } from '../qpdfProcessor';
+import {
+  protectPdfBrowser,
+  unlockPdfBrowser,
+  inspectPdfBrowser,
+  loadQpdfEngine,
+  resetQpdfEngineCacheForTests,
+} from '../qpdfProcessor';
+
+afterEach(() => {
+  resetQpdfEngineCacheForTests();
+});
 
 describe('Phase 3: Browser-Side qpdf-wasm Wrapper Tests', () => {
   it('protects and unlocks a PDF in a complete round-trip entirely browser-side', async () => {
@@ -18,21 +28,21 @@ describe('Phase 3: Browser-Side qpdf-wasm Wrapper Tests', () => {
       originalBytes,
       'TestPass123!',
       'OwnerMaster999!',
-      { print: 'full', modify: 'none', extract: false, annotate: false }
+      { print: 'full', modify: 'none', extract: false, annotate: false },
     );
 
     expect(protectedResult.bytes).toBeDefined();
-    expect(protectedResult.bytes.length).toBeGreaterThan(0);
+    expect(protectedResult.bytes.length).toBeGreaterThan(originalBytes.length);
     expect(protectedResult.pageCount).toBe(2);
 
     // 3. Inspect protected PDF to confirm password is required
     const inspection = await inspectPdfBrowser(protectedResult.bytes);
     expect(inspection.needsPassword).toBe(true);
 
-    // 4. Attempt unlock with wrong password should fail
+    // 4. Attempt unlock with wrong password should fail with clear incorrect-password message
     await expect(
-      unlockPdfBrowser(protectedResult.bytes, 'WrongPass999!')
-    ).rejects.toThrow();
+      unlockPdfBrowser(protectedResult.bytes, 'WrongPass999!'),
+    ).rejects.toThrow(/Incorrect password/i);
 
     // 5. Unlock with correct password 'TestPass123!'
     const unlockedResult = await unlockPdfBrowser(protectedResult.bytes, 'TestPass123!');
@@ -44,4 +54,29 @@ describe('Phase 3: Browser-Side qpdf-wasm Wrapper Tests', () => {
     const verifiedDoc = await PDFDocument.load(unlockedResult.bytes);
     expect(verifiedDoc.getPageCount()).toBe(2);
   });
+
+  it('does not cache rejected loadPromise on failed init and clears status on failure', async () => {
+    const statuses: string[] = [];
+    let attempts = 0;
+
+    await expect(
+      loadQpdfEngine((s) => statuses.push(s), async () => {
+        attempts += 1;
+        throw new Error('Network failure loading chunk');
+      }),
+    ).rejects.toThrow(/PDF engine failed to load/i);
+
+    expect(attempts).toBe(1);
+    expect(statuses[statuses.length - 1]).toBe('');
+
+    const fakeMod = { encrypt: async () => ({ bytes: new Uint8Array([1]) }) };
+    const retried = await loadQpdfEngine((s) => statuses.push(s), async () => {
+      attempts += 1;
+      return fakeMod;
+    });
+
+    expect(attempts).toBe(2);
+    expect(retried).toBe(fakeMod);
+  });
 });
+
