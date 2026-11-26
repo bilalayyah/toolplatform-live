@@ -109,7 +109,7 @@ export function AllToolsPage() {
   ];
 
   const seoTitle = `All Online Tools (${TOOLS.length}) | ${SITE_CONFIG.siteName}`;
-  const seoDescription = `Browse and filter all ${TOOLS.length} upcoming PDF, image, video, converter, and social creator tools across ${CATEGORIES.length} categories.`;
+  const seoDescription = `Browse and filter all ${TOOLS.length} upcoming PDF, image, video, converter, productivity, and developer tools across ${CATEGORIES.length} categories.`;
 
   return (
     <>

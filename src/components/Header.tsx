@@ -13,19 +13,9 @@ const PRIMARY_HEADER_ORDER: readonly ToolCategoryId[] = [
   'image-tools',
   'video-tools',
   'converter-tools',
-  'youtube-tools',
-  'instagram-tools',
-  'facebook-tools',
-  'tiktok-tools',
-  'pinterest-tools',
 ];
 
 const MORE_HEADER_ORDER: readonly ToolCategoryId[] = [
-  'linkedin-tools',
-  'reddit-tools',
-  'twitter-tools',
-  'snapchat-tools',
-  'threads-tools',
   'productivity-tools',
   'unit-converters',
   'science-tools',

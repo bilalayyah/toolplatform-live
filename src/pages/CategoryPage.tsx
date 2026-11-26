@@ -106,10 +106,9 @@ export function CategoryPage({categoryId}: CategoryPageProps) {
             </h2>
             <p className="mt-2.5 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
               No individual tools have launched in {category.name} yet. We are rolling out the
-              initial {TOOLS.length} utilities across PDF, Image, Video, Converter, social creator
-              suites, Productivity, Unit Converters, Number Systems, Lookup, Science, Generators,
-              Developer, Document, and Finance Tools first, and will expand {category.name} in a
-              future update.
+              initial {TOOLS.length} utilities across PDF, Image, Video, Converter, Productivity,
+              Unit Converters, Number Systems, Lookup, Science, Generators, Developer, Document,
+              and Finance Tools first, and will expand {category.name} in a future update.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link

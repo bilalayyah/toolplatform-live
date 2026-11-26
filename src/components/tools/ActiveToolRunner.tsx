@@ -10,16 +10,6 @@ import {UnitConverterRunner} from './UnitConverterRunner';
 import {ScienceToolsRunner} from './ScienceToolsRunner';
 import {FinanceToolsRunner} from './FinanceToolsRunner';
 import {DeveloperToolsRunner} from './DeveloperToolsRunner';
-import {YouTubeToolsRunner} from './YouTubeToolsRunner';
-import {InstagramToolsRunner} from './InstagramToolsRunner';
-import {FacebookToolsRunner} from './FacebookToolsRunner';
-import {TikTokToolsRunner} from './TikTokToolsRunner';
-import {PinterestToolsRunner} from './PinterestToolsRunner';
-import {LinkedInToolsRunner} from './LinkedInToolsRunner';
-import {RedditToolsRunner} from './RedditToolsRunner';
-import {TwitterToolsRunner} from './TwitterToolsRunner';
-import {SnapchatToolsRunner} from './SnapchatToolsRunner';
-import {ThreadsToolsRunner} from './ThreadsToolsRunner';
 import {PdfToolsRunner} from './PdfToolsRunner';
 import {ImageToolsRunner} from './ImageToolsRunner';
 
@@ -151,46 +141,6 @@ export function ActiveToolRunner({tool}: Props) {
         <LazyProductivityToolsRunner tool={tool} />
       </Suspense>
     );
-  }
-
-  if (tool.category === 'youtube-tools') {
-    return <YouTubeToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'instagram-tools') {
-    return <InstagramToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'facebook-tools') {
-    return <FacebookToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'tiktok-tools') {
-    return <TikTokToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'pinterest-tools') {
-    return <PinterestToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'linkedin-tools') {
-    return <LinkedInToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'reddit-tools') {
-    return <RedditToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'twitter-tools') {
-    return <TwitterToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'snapchat-tools') {
-    return <SnapchatToolsRunner tool={tool} />;
-  }
-
-  if (tool.category === 'threads-tools') {
-    return <ThreadsToolsRunner tool={tool} />;
   }
 
   if (tool.category === 'science-tools') {

@@ -41,16 +41,6 @@ const HOME_CATEGORY_ORDER: readonly ToolCategoryId[] = [
   'image-tools',
   'video-tools',
   'converter-tools',
-  'youtube-tools',
-  'instagram-tools',
-  'facebook-tools',
-  'tiktok-tools',
-  'pinterest-tools',
-  'linkedin-tools',
-  'reddit-tools',
-  'twitter-tools',
-  'snapchat-tools',
-  'threads-tools',
   'productivity-tools',
   'unit-converters',
   'science-tools',
@@ -101,16 +91,6 @@ const POPULAR_CATEGORY_LABEL_COLOR: Record<ToolCategoryId, string> = {
   'image-tools': 'text-teal-600 dark:text-teal-400',
   'video-tools': 'text-violet-600 dark:text-violet-400',
   'converter-tools': 'text-amber-600 dark:text-amber-400',
-  'youtube-tools': 'text-red-600 dark:text-red-400',
-  'instagram-tools': 'text-pink-600 dark:text-pink-400',
-  'facebook-tools': 'text-blue-600 dark:text-blue-400',
-  'tiktok-tools': 'text-fuchsia-600 dark:text-fuchsia-400',
-  'pinterest-tools': 'text-orange-600 dark:text-orange-400',
-  'linkedin-tools': 'text-indigo-600 dark:text-indigo-400',
-  'reddit-tools': 'text-[#FF4500] dark:text-orange-400',
-  'twitter-tools': 'text-sky-600 dark:text-sky-400',
-  'snapchat-tools': 'text-yellow-700 dark:text-yellow-400',
-  'threads-tools': 'text-slate-700 dark:text-slate-300',
   'productivity-tools': 'text-teal-600 dark:text-teal-400',
   'unit-converters': 'text-purple-600 dark:text-purple-400',
   'science-tools': 'text-emerald-600 dark:text-emerald-400',
@@ -172,7 +152,7 @@ export function HomePage() {
       : popularTools.filter((tool) => tool.category === activePopularTab);
 
   const seoTitle = `${SITE_CONFIG.siteName} — Free Online PDF, Image & Video Tools`;
-  const seoDescription = `Free tools to make everything simple. Explore ${TOOLS.length} upcoming online tools across PDF, video, image, converter, and social creator workflows on ToolPlatform.`;
+  const seoDescription = `Free tools to make everything simple. Explore ${TOOLS.length} upcoming online tools across PDF, video, image, converter, productivity, unit converter, developer, document, and finance workflows on ToolPlatform.`;
 
   return (
     <>

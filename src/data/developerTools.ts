@@ -286,16 +286,16 @@ export const DEVELOPER_TOOLS: readonly Tool[] = [
           'No. Instant HSL math runs inside your browser.',
       },
       {
-        question: 'Want to extract colours from an existing photo instead?',
+        question: 'Can I copy colours straight into CSS or design tools?',
         answer:
-          'Check out Instagram Color Palette Extractor or Pinterest Color Palette Extractor.',
+          'Yes. Copy any HEX, RGB, HSL, or harmony swatch with one click.',
       },
     ],
     relatedTools: [
       'developer-code-beautifier',
-      'instagram-color-palette-extractor',
-      'pinterest-color-palette-extractor',
       'developer-json-formatter',
+      'convert-image',
+      'developer-base64-encoder-decoder',
     ],
     popular: false,
     featured: false,

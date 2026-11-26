@@ -42,7 +42,7 @@ const PLATFORM_FAQS: readonly ToolFaq[] = [
   },
   {
     question: 'Why are File Tools and Web Tools empty right now?',
-    answer: `We are building out the initial ${TOOLS.length} tools across PDF, Image, Video, Converter, social creator suites, Productivity, Unit Converters, Number Systems, Lookup, Science, Generators, Developer, Document, and Finance Tools first. File Tools and Web Tools are reserved categories whose individual utilities will be announced in later phases.`,
+    answer: `We are building out the initial ${TOOLS.length} tools across PDF, Image, Video, Converter, Productivity, Unit Converters, Number Systems, Lookup, Science, Generators, Developer, Document, and Finance Tools first. File Tools and Web Tools are reserved categories whose individual utilities will be announced in later phases.`,
   },
   {
     question: 'Which languages are supported right now?',
@@ -65,7 +65,7 @@ export function FaqPage() {
     <>
       <SeoHead
         title={`Frequently Asked Questions | ${SITE_CONFIG.siteName}`}
-        description={`Answers to common questions about ${SITE_CONFIG.siteName} Phase 1, upcoming PDF, image, video, converter, and social creator tools, privacy, and limits.`}
+        description={`Answers to common questions about ${SITE_CONFIG.siteName} Phase 1, upcoming PDF, image, video, converter, productivity, and developer tools, privacy, and limits.`}
         canonicalPath="/faq"
         jsonLd={[buildBreadcrumbSchema(breadcrumbs), buildFaqSchema(PLATFORM_FAQS)]}
       />

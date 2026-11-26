@@ -83,94 +83,6 @@ const SPECIAL_DISCLOSURES: Record<string, string> = {
     'This tool crops your photo into a round profile picture with the background colour you choose. It does not automatically detect faces or remove backgrounds.',
   'excel-to-pdf':
     'Simple spreadsheets only — complex formatting, macros, formulas, and embedded charts are not preserved.',
-  'youtube-embed-code-generator':
-    'Template/formula-based only — NOT AI-generated. Builds standard responsive YouTube iframe HTML code from your parameters in the browser.',
-  'youtube-timestamp-link-generator':
-    'Formula-based only — NOT AI-generated. Computes exact start-time query parameters (?t=...) locally in your browser.',
-  'youtube-thumbnail-text-extractor':
-    'Coming soon — reliable in-browser text extraction from thumbnail images is not yet supported in-browser. This tool is currently in development.',
-  'youtube-tag-generator':
-    'Template and keyword-combination based only — NOT AI-generated. Expands your topic with curated tag patterns locally in your browser.',
-  'youtube-hashtag-generator':
-    'Template and keyword-rule based only — NOT AI-generated. Builds clean YouTube hashtag combinations from your seed keywords in the browser.',
-  'youtube-title-generator':
-    'Template/formula-based only — NOT AI-generated. Applies proven structural title formulas to your topic keywords locally in your browser.',
-  'youtube-description-generator':
-    'Template-based only — NOT AI-generated. Assembles structured summary, link, timestamp, and call-to-action blocks using editable templates.',
-  'youtube-channel-name-generator':
-    'Template and word-combination based only — NOT AI-generated. Mixes niche prefixes, suffixes, and formatting rules locally in your browser.',
-  'youtube-username-generator':
-    'Template and handle-rule based only — NOT AI-generated. Formats clean handle suggestions matching YouTube character rules in your browser.',
-  'youtube-script-generator':
-    'Template outline only — NOT AI-written. Builds editable hook, intro, talking-point, and CTA script sections from structured templates in your browser.',
-  'youtube-hook-generator':
-    'Template/formula-based only — NOT AI-generated. Generates opening-line prompts from proven retention hook frameworks in your browser.',
-  'youtube-video-idea-generator':
-    'Template/formula-based only — NOT AI-generated. Combines your niche keyword with proven video format matrices in your browser.',
-  'youtube-shorts-idea-generator':
-    'Template/formula-based only — NOT AI-generated. Maps your topic into vertical 60-second Shorts prompt templates locally in your browser.',
-  'youtube-chapter-generator':
-    'Template and timestamp-formatting helper only — NOT AI-generated. Validates and formats 00:00 chapter markers cleanly in your browser.',
-  'youtube-pinned-comment-generator':
-    'Template-based only — NOT AI-generated. Provides editable engagement question, link, and poll comment templates locally in your browser.',
-  'youtube-content-calendar-generator':
-    'Template/formula-based only — NOT AI-generated. Generates an editable weekly publishing schedule from your cadence and video pillars.',
-  'youtube-earnings-calculator':
-    'Estimate-only disclaimer: actual earnings vary by niche, country and ad rates. Formula results are for educational planning only.',
-  'youtube-rpm-calculator':
-    'Estimate-only disclaimer: actual RPM varies by niche, audience country, season and ad formats.',
-  'youtube-cpm-calculator':
-    'Estimate-only disclaimer: actual advertiser CPM rates vary by niche, geography and seasonal demand.',
-  'instagram-username-availability-format-checker':
-    'Format check only — validates Instagram username syntax rules (1–30 characters, letters, numbers, periods, and underscores). It cannot check live username availability on Instagram.',
-  'instagram-giveaway-winner-picker':
-    'Pasted entries only — picks random winners strictly from the names or comments you paste into the browser. It cannot connect to Instagram or fetch real entrants or comments.',
-  'instagram-random-comment-picker':
-    'Pasted comments only — picks random comments strictly from the list you paste into the browser. It cannot connect to Instagram or fetch real post comments.',
-  'instagram-best-posting-time-planner':
-    'Planning guide only — combines general engagement-window benchmarks with your own audience timezone and schedule inputs. It cannot connect to Instagram or fetch real account analytics.',
-  'facebook-giveaway-winner-picker':
-    'Pasted entries only — picks random winners strictly from the names or comments you paste into the browser. It cannot connect to Facebook or fetch real entrants or comments.',
-  'facebook-random-comment-picker':
-    'Pasted comments only — picks random comments strictly from the list you paste into the browser. It cannot connect to Facebook or fetch real post comments.',
-  'facebook-post-scheduler-planner':
-    'Plan only — organizes and exports your upcoming Facebook publishing calendar locally in your browser. It cannot connect to Facebook, schedule live posts, or publish automatically.',
-  'tiktok-username-format-checker':
-    'Format check only — validates TikTok handle length (2–24 characters), allowed letters/numbers/underscores/periods, and trailing-period syntax locally. Never checks live TikTok username availability.',
-  'tiktok-trending-hashtag-ideas-generator':
-    'Template hashtag ideas only — NOT live TikTok trending data and NOT AI-generated. Provides curated category starter tag templates for manual review.',
-  'tiktok-viral-video-idea-generator':
-    'Template brainstorming frameworks only — NOT AI-generated and cannot guarantee virality, views, or For You placement.',
-  'tiktok-script-generator':
-    'Template outline only — NOT AI-written. Builds editable Hook, Setup, Value Steps, and CTA bullet sections inside your browser.',
-  'tiktok-money-calculator':
-    'Estimate-only disclaimer: actual TikTok payouts vary significantly by viewer region, qualified 1-minute+ views, niche, watch time, and sponsorship terms.',
-  'tiktok-earnings-calculator':
-    'Estimate-only disclaimer: actual TikTok Creator Rewards and brand-deal earnings vary by country, niche, qualified view share, and advertiser rates.',
-  'tiktok-best-posting-time-planner':
-    'Planning guide only — combines general engagement-window benchmarks with your own timezone and schedule inputs. Cannot fetch live TikTok analytics.',
-  'tiktok-giveaway-winner-picker':
-    'Pasted entries only — draws random winners strictly from names or handles you paste into the browser. Cannot connect to TikTok or fetch real entrants.',
-  'tiktok-random-comment-picker':
-    'Pasted comments only — picks random comments strictly from the list you paste into the browser. Cannot fetch live TikTok post comments.',
-  'tiktok-video-file-size-estimator':
-    'Estimate only — approximates MP4 file weight from bitrate and duration formulas. Actual variable-bitrate (VBR) exports vary with motion complexity.',
-  'pinterest-pin-text-extractor':
-    'Uses free in-browser OCR — text is recognized locally on your device without external paid APIs or image uploads. Accuracy depends on font clarity and contrast.',
-  'pinterest-alt-text-generator':
-    'User-described alt text only — builds accessible alt text strictly from YOUR own visual description of the image using browser templates. NOT auto-vision and NOT AI.',
-  'reddit-username-checker':
-    'Format check only — validates Reddit u/ username syntax (3–20 characters and allowed letters, numbers, underscores, or hyphens) locally in your browser. Never checks live Reddit availability or logs into Reddit.',
-  'snapchat-username-format-checker':
-    'Format check only — validates Snapchat username syntax (3–15 characters, starts with a letter, allowed letters/numbers/periods/underscores/hyphens) locally in your browser. Never checks live Snapchat availability.',
-  'reddit-karma-calculator':
-    "Estimate-only disclaimer: Reddit's exact karma calculation formula is not public. Results are directional estimates based on submission scores and upvote ratios, with zero Reddit login.",
-  'reddit-comment-picker':
-    'Pasted comments only — picks random winners or replies strictly from text you paste into the browser. Designed for Reddit users without posting to Reddit or logging into an account.',
-  'snapchat-score-tracker-template':
-    'Browser-saved tracker only — records your manual Snap Score log entries locally inside your browser without Snapchat login or live account syncing.',
-  'linkedin-profile-optimization-checklist':
-    'Browser-saved checklist only — saves your LinkedIn profile audit progress locally in your browser with zero LinkedIn login required.',
   'unit-land-area-converter':
     'Regional variation notice: Bigha size varies by region (alongside biswa and katha) depending on state and local revenue definitions. Fixed units such as acre, hectare, cent, guntha, and gaj follow standard multipliers.',
   'indian-land-unit-converter':
@@ -223,32 +135,6 @@ function getSpecialDisclosure(toolId: string, category: string): string | undefi
   }
   if (category === 'number-system-converters') {
     return 'Pure formula calculator — NOT AI. Evaluates deterministic digital logic and two-way bitwise conversions directly inside your browser.';
-  }
-  if (
-    (category === 'instagram-tools' ||
-      category === 'facebook-tools' ||
-      category === 'tiktok-tools' ||
-      category === 'pinterest-tools' ||
-      category === 'linkedin-tools' ||
-      category === 'reddit-tools' ||
-      category === 'twitter-tools' ||
-      category === 'snapchat-tools' ||
-      category === 'threads-tools') &&
-    toolId.endsWith('-generator')
-  ) {
-    if (toolId.includes('font-generator') || toolId.includes('stylish-text')) {
-      return 'Template & Unicode mapping only — NOT AI-generated. Converts your text into styled Unicode characters and pairing presets locally in your browser with zero social login.';
-    }
-    if (toolId.includes('mockup-generator') || toolId.includes('preview-generator')) {
-      return 'Template mockup only — NOT AI-generated. Arranges your entered text and images inside an editable browser layout frame with zero social login.';
-    }
-    if (category === 'reddit-tools') {
-      return 'Template-based only — NOT AI-generated. Built for Reddit users locally in your browser with zero social login and no posting on Reddit.';
-    }
-    return 'Template-based only — NOT AI-generated. Combines structured editorial templates, formulas, and your topic inputs locally in your browser with zero social login.';
-  }
-  if (category === 'reddit-tools') {
-    return 'Browser utility for Reddit users — runs locally with zero Reddit login and cannot post or submit content to Reddit.';
   }
   return undefined;
 }
