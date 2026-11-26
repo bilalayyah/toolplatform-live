@@ -1,4 +1,5 @@
 import {SITE_CONFIG} from '../config/site';
+import {COMPRESS_PDF_GUIDE} from './compressPdfGuide';
 import {DEVELOPER_TOOLS} from './developerTools';
 import {DOCUMENT_TOOLS} from './documentTools';
 import {FINANCE_TOOLS} from './financeTools';
@@ -38,6 +39,90 @@ export interface ToolHowToStep {
 export interface ToolFaq {
   question: string;
   answer: string;
+}
+
+export interface ToolGuideStep {
+  number: string;
+  title: string;
+  description: string;
+}
+
+export interface ToolGuideTableRow {
+  col1: string;
+  col2: string;
+  col3?: string;
+}
+
+export interface ToolGuideTable {
+  title: string;
+  headers: string[];
+  rows: ToolGuideTableRow[];
+}
+
+export interface ToolGuideInlineLink {
+  slug: string;
+  label: string;
+}
+
+export interface ToolGuideExample {
+  title: string;
+  scenario: string;
+  note: string;
+}
+
+export interface ToolGuideTroubleshooting {
+  problem: string;
+  solution: string;
+}
+
+export interface ToolGuideRecommendedTool {
+  slug: string;
+  name: string;
+  reason: string;
+}
+
+export interface ToolGuide {
+  howItWorks: {
+    heading: string;
+    paragraphs: string[];
+    steps: ToolGuideStep[];
+    referenceLine: string;
+  };
+  choiceSection: {
+    heading: string;
+    paragraphs: string[];
+    table: ToolGuideTable;
+    inlineLinksNote: string;
+    inlineLinks: ToolGuideInlineLink[];
+  };
+  examples: {
+    heading: string;
+    intro: string;
+    items: ToolGuideExample[];
+  };
+  limitsSection: {
+    heading: string;
+    paragraphs: string[];
+    table: ToolGuideTable;
+  };
+  useCases: {
+    heading: string;
+    intro: string;
+    items: string[];
+  };
+  tips: {
+    heading: string;
+    items: Array<{ lead: string; text: string }>;
+  };
+  troubleshooting: {
+    heading: string;
+    items: ToolGuideTroubleshooting[];
+  };
+  moreTools: {
+    heading: string;
+    intro: string;
+    tools: ToolGuideRecommendedTool[];
+  };
 }
 
 export interface ToolCategory {
@@ -81,6 +166,7 @@ export interface Tool {
   featured: boolean;
   rating: null;
   status: 'active' | 'coming-soon';
+  guide?: ToolGuide;
 }
 
 export const CATEGORIES: readonly ToolCategory[] = [
@@ -794,7 +880,7 @@ export const TOOLS: readonly Tool[] = [
     url: '/compress-pdf',
     description: 'Reduce PDF file size for faster email attachments and uploads.',
     longDescription:
-      'Large reports and exports often exceed portal upload caps. Compress PDF optimizes object streams and strips redundant metadata directly in your browser while keeping text crisp and readable.',
+      'Compress PDF is an in-browser document optimizer engineered to streamline file structure without degrading text clarity or stripping vector layout. Instead of transmitting private records across the internet, the tool evaluates PDF object streams locally inside your web browser. By consolidating cross-reference tables and eliminating unreferenced structural metadata, it produces compact documents that open smoothly and upload reliably.',
     keywords: [
       'compress pdf',
       'shrink pdf',
@@ -813,41 +899,71 @@ export const TOOLS: readonly Tool[] = [
       'Compress PDF optimizes PDF files up to 50 MB in your browser while keeping text sharp and readable.',
     howTo: [
       {
-        title: 'Choose your PDF file',
+        title: 'Choose your PDF files',
         description:
-          'Select a PDF file (max 50 MB) or use Try sample PDF to load a test document.',
+          'Select up to five PDF documents under 50 MB each or click Try sample PDF.',
       },
       {
-        title: 'Run browser optimization',
+        title: 'Run local optimization',
         description:
-          'Click Run Compress PDF to rewrite object streams and remove redundant metadata.',
+          'Click Run Compress PDF to restructure internal streams in browser memory.',
       },
       {
-        title: 'Save the optimized PDF',
+        title: 'Download optimized files',
         description:
-          'Download your re-packed PDF directly in the browser with no file uploads.',
+          'Save your streamlined PDF immediately with zero cloud uploads or waiting queues.',
       },
     ],
     faqs: [
       {
         question: 'Does Compress PDF run locally in my browser?',
         answer:
-          'Yes. Object-stream optimization runs directly in your browser tab so documents stay private on your device.',
+          'Yes. All stream compaction runs entirely in browser memory via WebAssembly. Your files never transfer across external networks.',
       },
       {
-        question: 'Does compressing a PDF blur my text?',
+        question: 'Does compressing a PDF blur or degrade vector text?',
         answer:
-          'No. Vector text and fonts remain sharp while compression uses PDF object streams and metadata cleanup.',
+          'No. Optimization focuses on structural consolidation. Vector typography, line drawings, and coordinate paths stay completely sharp at every zoom level.',
       },
       {
         question: 'How much smaller will my PDF become?',
         answer:
-          'Savings depend on how uncompressed the input PDF structure is; already compressed PDFs or image-heavy scans may see modest reductions.',
+          'Byte reduction depends on source structure. Documents with redundant fonts or revision markers yield noticeable compaction, whereas pre-compressed files show modest results.',
       },
       {
-        question: 'What is the maximum file size for Compress PDF?',
+        question: 'What is the maximum file size limit for Compress PDF?',
         answer:
-          'Compress PDF accepts PDF files up to 50 MB.',
+          'The utility accepts files up to 50 MB each to preserve smooth browser responsiveness and prevent memory limits on mobile devices.',
+      },
+      {
+        question: 'Can I compress multiple PDF documents at once?',
+        answer:
+          'Yes. You can process up to five PDF files simultaneously. Each document optimizes independently in memory and downloads right away.',
+      },
+      {
+        question: 'Why did my scanned PDF barely reduce in size?',
+        answer:
+          'Scanned pages are full-page bitmap pictures. Because stream optimization preserves raw image resolution rather than downsampling pixels, scans require source DPI adjustments.',
+      },
+      {
+        question: 'Can Compress PDF optimize password-protected documents?',
+        answer:
+          'Encrypted files block structure optimization. Unlock the file first using Unlock PDF, perform stream compression, and restore security using Protect PDF.',
+      },
+      {
+        question: 'Will compressing a PDF alter page layout, margins, or bookmarks?',
+        answer:
+          'No. Page coordinates, bookmarks, outlines, and interactive form fields remain intact. The engine streamlines file containers without modifying visual content.',
+      },
+      {
+        question: 'Is Compress PDF free to use without an account?',
+        answer:
+          'Yes. Compress PDF is entirely free with no registration, software setup, or subscription requirements. There are no countdown timers or daily limits.',
+      },
+      {
+        question: 'What should I do if my PDF is larger than 50 MB?',
+        answer:
+          'For files exceeding the 50 MB limit, divide large documents into smaller chapters using Split PDF before running local stream compression.',
       },
     ],
     relatedTools: ['merge-pdf', 'split-pdf', 'pdf-to-word', 'compress-image'],
@@ -855,6 +971,7 @@ export const TOOLS: readonly Tool[] = [
     featured: true,
     rating: null,
     status: 'active',
+    guide: COMPRESS_PDF_GUIDE,
   },
   {
     id: 'pdf-to-jpg',

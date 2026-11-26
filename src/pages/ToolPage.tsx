@@ -340,50 +340,425 @@ export function ToolPage({slug}: ToolPageProps) {
           </p>
         )}
 
-        {/* 3-Step "How To" Strip */}
-        <section className="mt-14">
-          <h2 className="font-display text-2xl font-extrabold tracking-tight text-slate-950 dark:text-white text-center mb-7">
-            {tool.status === 'active'
-              ? `How to Use ${tool.name}`
-              : `How to Use ${tool.name} (Planned Workflow)`}
-          </h2>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-            {tool.howTo.map((step, idx) => (
-              <div
-                key={step.title}
-                className="rounded-[14px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.05)] dark:shadow-none"
+        {tool.guide ? (
+          <div className="mt-14 space-y-16">
+            {/* 1. How to Use (01., 02., 03.) */}
+            <section aria-labelledby="guide-how-to-use">
+              <h2
+                id="guide-how-to-use"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white text-center mb-8"
               >
-                <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 dark:bg-sky-500/15 font-mono text-sm font-bold text-[#0A8CFF] tabular-nums">
-                  {idx + 1}
-                </div>
-                <h3 className="mt-3 font-display text-base font-bold text-slate-950 dark:text-white">
-                  {step.title}
-                </h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                  {step.description}
-                </p>
+                How to Use {tool.name}
+              </h2>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                {tool.howTo.map((step, idx) => {
+                  const stepNum = String(idx + 1).padStart(2, '0');
+                  return (
+                    <div
+                      key={step.title}
+                      className="relative rounded-[16px] border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.05)] dark:shadow-none"
+                    >
+                      <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-sky-50 dark:bg-sky-500/15 font-mono text-sm font-bold text-[#0A8CFF]">
+                        {stepNum}.
+                      </div>
+                      <h3 className="mt-4 font-display text-base font-bold text-slate-950 dark:text-white">
+                        {step.title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                        {step.description}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            </section>
+
+            {/* 2. About Compress PDF */}
+            <section
+              aria-labelledby="guide-about"
+              className="rounded-[16px] border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-6 sm:p-8"
+            >
+              <h2
+                id="guide-about"
+                className="font-display text-xl sm:text-2xl font-bold text-slate-950 dark:text-white"
+              >
+                About {tool.name}
+              </h2>
+              <p className="mt-3 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
+                {tool.longDescription}
+              </p>
+            </section>
+
+            {/* 3. How Compress PDF Works */}
+            <section aria-labelledby="guide-how-it-works">
+              <h2
+                id="guide-how-it-works"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-6"
+              >
+                {tool.guide.howItWorks.heading}
+              </h2>
+              <div className="space-y-4 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
+                {tool.guide.howItWorks.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {tool.guide.howItWorks.steps.map((st) => (
+                  <div
+                    key={st.number}
+                    className="rounded-[14px] border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+                  >
+                    <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 dark:bg-sky-500/15 font-mono text-xs font-bold text-[#0A8CFF]">
+                      {st.number}
+                    </div>
+                    <h3 className="mt-3 font-display text-sm sm:text-base font-bold text-slate-950 dark:text-white">
+                      {st.title}
+                    </h3>
+                    <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      {st.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="mt-6 text-xs sm:text-sm italic text-slate-500 dark:text-slate-400 border-l-2 border-sky-400 pl-3">
+                {tool.guide.howItWorks.referenceLine}
+              </p>
+            </section>
+
+            {/* 4. Which PDFs Compress Well? */}
+            <section aria-labelledby="guide-choice-section">
+              <h2
+                id="guide-choice-section"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-6"
+              >
+                {tool.guide.choiceSection.heading}
+              </h2>
+              <div className="space-y-4 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
+                {tool.guide.choiceSection.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+
+              {/* Comparison Table */}
+              <div className="mt-6 overflow-x-auto rounded-[14px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                <table className="w-full border-collapse text-left text-xs sm:text-sm">
+                  <caption className="sr-only">{tool.guide.choiceSection.table.title}</caption>
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 font-semibold">
+                      {tool.guide.choiceSection.table.headers.map((h, i) => (
+                        <th key={i} className="py-3 px-4 font-semibold text-xs sm:text-sm">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                    {tool.guide.choiceSection.table.rows.map((row, idx) => (
+                      <tr
+                        key={idx}
+                        className={
+                          idx % 2 === 0
+                            ? 'bg-white dark:bg-slate-900'
+                            : 'bg-slate-50/40 dark:bg-slate-800/20'
+                        }
+                      >
+                        <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                          {row.col1}
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-[#0A8CFF] whitespace-nowrap">
+                          {row.col2}
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                          {row.col3}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Inline Companion Links */}
+              <div className="mt-6 rounded-[14px] border border-sky-100 dark:border-slate-800 bg-sky-50/40 dark:bg-slate-900/60 p-5">
+                <p className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                  {tool.guide.choiceSection.inlineLinksNote}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {tool.guide.choiceSection.inlineLinks.map((link) => (
+                    <Link
+                      key={link.slug}
+                      to={`/${link.slug}`}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-sky-200/70 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs sm:text-sm font-medium text-[#0A8CFF] hover:border-[#0A8CFF] dark:hover:border-[#0A8CFF] transition-colors"
+                    >
+                      <span>{link.label}</span>
+                      <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* 5. Compress PDF Examples */}
+            <section aria-labelledby="guide-examples">
+              <h2
+                id="guide-examples"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-4"
+              >
+                {tool.guide.examples.heading}
+              </h2>
+              <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300 mb-6">
+                {tool.guide.examples.intro}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tool.guide.examples.items.map((ex, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-[14px] border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 flex flex-col justify-between"
+                  >
+                    <div>
+                      <h3 className="font-display text-base font-bold text-slate-950 dark:text-white">
+                        {ex.title}
+                      </h3>
+                      <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                        {ex.scenario}
+                      </p>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs sm:text-sm font-medium text-sky-700 dark:text-sky-300">
+                      {ex.note}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 6. Where Compress PDF Works — and Where It Does Not Fit */}
+            <section aria-labelledby="guide-limits">
+              <h2
+                id="guide-limits"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-6"
+              >
+                {tool.guide.limitsSection.heading}
+              </h2>
+              <div className="space-y-4 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
+                {tool.guide.limitsSection.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+
+              <div className="mt-6 overflow-x-auto rounded-[14px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+                <table className="w-full border-collapse text-left text-xs sm:text-sm">
+                  <caption className="sr-only">
+                    {tool.guide.limitsSection.table.title}
+                  </caption>
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 font-semibold">
+                      {tool.guide.limitsSection.table.headers.map((h, i) => (
+                        <th key={i} className="py-3 px-4 font-semibold text-xs sm:text-sm">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                    {tool.guide.limitsSection.table.rows.map((row, idx) => (
+                      <tr
+                        key={idx}
+                        className={
+                          idx % 2 === 0
+                            ? 'bg-white dark:bg-slate-900'
+                            : 'bg-slate-50/40 dark:bg-slate-800/20'
+                        }
+                      >
+                        <td className="py-3 px-4 font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                          {row.col1}
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                          {row.col2}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            {/* 7. What People Use Compress PDF For */}
+            <section aria-labelledby="guide-use-cases">
+              <h2
+                id="guide-use-cases"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-4"
+              >
+                {tool.guide.useCases.heading}
+              </h2>
+              <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300 mb-6">
+                {tool.guide.useCases.intro}
+              </p>
+
+              <ul className="space-y-3">
+                {tool.guide.useCases.items.map((item, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start gap-3 rounded-[12px] border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 text-xs sm:text-sm leading-relaxed text-slate-700 dark:text-slate-300"
+                  >
+                    <div
+                      className="h-2 w-2 rounded-full bg-[#0A8CFF] mt-2 shrink-0"
+                      aria-hidden="true"
+                    />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* 8. Tips for Smaller PDFs That Stay Readable */}
+            <section aria-labelledby="guide-tips">
+              <h2
+                id="guide-tips"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-6"
+              >
+                {tool.guide.tips.heading}
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tool.guide.tips.items.map((tip, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-[14px] border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-5"
+                  >
+                    <h3 className="font-display text-sm sm:text-base font-bold text-slate-950 dark:text-white">
+                      {tip.lead}
+                    </h3>
+                    <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      {tip.text}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 9. Compress PDF Not Working? Fix It Here */}
+            <section aria-labelledby="guide-troubleshooting">
+              <h2
+                id="guide-troubleshooting"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-6"
+              >
+                {tool.guide.troubleshooting.heading}
+              </h2>
+
+              <div className="space-y-4">
+                {tool.guide.troubleshooting.items.map((tb, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-[14px] border border-amber-200/80 dark:border-amber-900/40 bg-amber-50/40 dark:bg-amber-950/20 p-5"
+                  >
+                    <h3 className="font-display text-sm sm:text-base font-bold text-amber-950 dark:text-amber-200">
+                      {tb.problem}
+                    </h3>
+                    <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                      {tb.solution}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* 10. More PDF Tools on ToolPlatform */}
+            <section aria-labelledby="guide-more-tools">
+              <h2
+                id="guide-more-tools"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-4"
+              >
+                {tool.guide.moreTools.heading}
+              </h2>
+              <p className="text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300 mb-6">
+                {tool.guide.moreTools.intro}
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {tool.guide.moreTools.tools.map((t) => (
+                  <Link
+                    key={t.slug}
+                    to={`/${t.slug}`}
+                    className="group rounded-[14px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:border-[#0A8CFF] dark:hover:border-[#0A8CFF] transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <h3 className="font-display text-base font-bold text-slate-950 dark:text-white group-hover:text-[#0A8CFF] transition-colors">
+                        {t.name}
+                      </h3>
+                      <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                        {t.reason}
+                      </p>
+                    </div>
+                    <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-[#0A8CFF]">
+                      <span>Open tool</span>
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            {/* 11. Compress PDF FAQs */}
+            <section aria-labelledby="guide-faqs">
+              <h2
+                id="guide-faqs"
+                className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-6"
+              >
+                Compress PDF FAQs
+              </h2>
+              <FaqAccordion faqs={tool.faqs} />
+            </section>
           </div>
-        </section>
+        ) : (
+          <>
+            {/* 3-Step "How To" Strip */}
+            <section className="mt-14">
+              <h2 className="font-display text-2xl font-extrabold tracking-tight text-slate-950 dark:text-white text-center mb-7">
+                {tool.status === 'active'
+                  ? `How to Use ${tool.name}`
+                  : `How to Use ${tool.name} (Planned Workflow)`}
+              </h2>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                {tool.howTo.map((step, idx) => (
+                  <div
+                    key={step.title}
+                    className="rounded-[14px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-[0_2px_12px_-4px_rgba(15,23,42,0.05)] dark:shadow-none"
+                  >
+                    <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-50 dark:bg-sky-500/15 font-mono text-sm font-bold text-[#0A8CFF] tabular-nums">
+                      {idx + 1}
+                    </div>
+                    <h3 className="mt-3 font-display text-base font-bold text-slate-950 dark:text-white">
+                      {step.title}
+                    </h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      {step.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-        {/* Long Description */}
-        <section className="mt-12 rounded-[14px] border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-6 sm:p-8">
-          <h2 className="font-display text-xl font-bold text-slate-950 dark:text-white">
-            About {tool.name}
-          </h2>
-          <p className="mt-2.5 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-            {tool.longDescription}
-          </p>
-        </section>
+            {/* Long Description */}
+            <section className="mt-12 rounded-[14px] border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-6 sm:p-8">
+              <h2 className="font-display text-xl font-bold text-slate-950 dark:text-white">
+                About {tool.name}
+              </h2>
+              <p className="mt-2.5 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
+                {tool.longDescription}
+              </p>
+            </section>
 
-        {/* 4 FAQs in an Accordion */}
-        <section className="mt-12">
-          <h2 className="font-display text-2xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-5">
-            Frequently Asked Questions
-          </h2>
-          <FaqAccordion faqs={tool.faqs} />
-        </section>
+            {/* 4 FAQs in an Accordion */}
+            <section className="mt-12">
+              <h2 className="font-display text-2xl font-extrabold tracking-tight text-slate-950 dark:text-white mb-5">
+                Frequently Asked Questions
+              </h2>
+              <FaqAccordion faqs={tool.faqs} />
+            </section>
+          </>
+        )}
 
         {/* 4 Related Tools */}
         {relatedTools.length > 0 && (
