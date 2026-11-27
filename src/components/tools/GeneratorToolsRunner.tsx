@@ -20,6 +20,7 @@ import {
   Users,
 } from 'lucide-react';
 import type {Tool} from '../../data/tools';
+import {AlphabetsToWordWorkspace} from './AlphabetsToWordWorkspace';
 
 interface Props {
   tool: Tool;
@@ -115,6 +116,8 @@ export function GeneratorToolsRunner({tool}: Props) {
       return <DjangoSecretKeyWorkspace tool={tool} />;
     case 'wordpress-secret-key-generator':
       return <WordPressSecretKeyWorkspace tool={tool} />;
+    case 'alphabets-to-word-generator':
+      return <AlphabetsToWordWorkspace tool={tool} />;
     default:
       return null;
   }

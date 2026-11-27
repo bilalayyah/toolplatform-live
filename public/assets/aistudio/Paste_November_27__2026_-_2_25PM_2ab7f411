@@ -1,0 +1,258 @@
+# BATCH 12 — 1 NEW TOOL: ALPHABETS TO WORD GENERATOR
+
+## 1. PROJECT CONTEXT (read first)
+
+You are working on an existing multi-tool website built in Google AI Studio.
+
+- **App name:** OmniTool (the site is branded **ToolPlatform** everywhere — do not change the brand name).
+- **Account:** shaheensukheera@gmail.com
+- **App ID:** da00ba3d-9ed4-4ae2-bea3-c68df26ffb8c
+- **App URL:** https://aistudio.google.com/apps/da00ba3d-9ed4-4ae2-bea3-c68df26ffb8c — note the account index in the URL (u/0 or u/1) varies by session; the **app ID is what matters**. You are already signed in and on the app page in the current window — **continue in this same window. Do NOT navigate away, do NOT sign out, do NOT switch accounts.**
+- **Stack:** React + TypeScript + Vite + Tailwind. Tool registry in `src/data/tools.ts` (aggregates per-category files). Tool pages are registry-driven (`src/pages/ToolPage.tsx`). Brand values live in `src/config/site.ts`. The site is LIVE at https://toolplatform.pages.dev/ (repo bilalayyah/toolplatform-live, branch main).
+- **Work in DESKTOP mode. Use FREE models only — try Gemini 4 Hydrogen first; if it hits its daily limit, try the other free models (Gemini Flash Latest, Gemini 3.5 Flash Lite, Gemini Flash-Lite Latest). Never use a paid model.** If every free model shows a daily limit, stop and report the reset times — do not start a paid model or an upgrade.
+- **Do NOT create a new app. Do NOT deploy to Cloudflare. Do NOT buy anything or use any paid service. Syncing the finished change to GitHub (Section 5) IS part of this task.**
+
+## 2. WHAT THIS BATCH IS
+
+Build **1 NEW tool** on ToolPlatform — **Alphabets to Word Generator** — into the **Generators** category (currently 9 tools → 10).
+
+- **Source:** a master development prompt written for the sister site UtilityFlow. **The UtilityFlow version of this tool is NOT built yet** (verified: the UtilityFlow repo has no alphabets/word-generator file — its `src/tools/calculators/` directory holds 16 files, none of them word-related). There is NO reference implementation to copy. **The master prompt IS the spec** — build from it. Do NOT go looking for a UtilityFlow build of this tool; if you find one, report it in your final report and do NOT copy its code.
+- **SEQUENCING — READ THIS FIRST.** Batch 11 (Roman Numeral Converter + Online Hourly Calculator) is landing in this SAME app just before this batch. This prompt assumes the **POST-Batch-11 state: 173 tools, 15 categories, sitemap 197 URLs**. After this batch: **174 tools, 15 categories, sitemap 198 URLs**. Section 0 has a guard for this — if Batch 11 has NOT landed, STOP and report; do NOT build on the stale count.
+- **One landing page for the tool, with complete on-page SEO (How-to, About, FAQs, honest limits). NO separate articles, NO blog posts, NO supporting article pages.** The user has ordered this explicitly for every tool on every site: build the tool only.
+
+> ⚠️ **CRITICAL LESSON FROM BATCH 3 — READ THIS FIRST.** In Batch 3 the prompt listed 24 tool names, but the app registry had DIFFERENT names — only 8 overlapped, and 12 prompted tools did not exist in the app at all. The slug in this batch was verified FREE in the ToolPlatform registry (`src/data/tools.ts` — 0 hits for `alphabets-to-word-generator`, and 0 hits for `alphabets` / `anagram` / `unscrambler` / `word-finder` anywhere). **Before you build or change anything, re-check the slug against the registry yourself. If it already exists, STOP and report it as already-present in your final report — never substitute a different tool, never rename an existing tool, never invent a tool, and never silently build a tool under a different slug.** If a registry file is named differently from the names in Section 3, find the registry through `src/data/tools.ts` — the slug check above is what matters, not the filenames.
+
+## 3. FACTS — VERIFIED FROM THE REPOS (use them verbatim)
+
+### 3.1 ToolPlatform today (repo bilalayyah/toolplatform-live, main — PRE-Batch-11 HEAD 5a02f36; this batch assumes Batch 11 has landed — see the Section 0 guard)
+
+- **Post-Batch-11 assumed state: 173 tools, 15 categories. Sitemap: 197 URLs** (live sitemap was 195 URLs before Batch 11; Batch 11 adds 2). The sitemap is generated at build time by the vite plugin from `src/lib/seoFiles.ts` (`generateSitemapXml()`) — it updates automatically from the registry; verify the built sitemap has 198 URLs after this batch.
+- **Tool type** (`src/data/tools.ts`, `export interface Tool` at line 142): `id`, `name`, `slug`, `category: ToolCategoryId`, `url` (`/<slug>`), `description`, `longDescription`, `keywords: string[]`, `icon` (lucide-react icon name), `acceptedFormats: string[]`, `maxFileSizeMB: number | null`, `maxFiles: number | null`, `processingMethod`, `seoTitle`, `seoDescription`, `howTo: [ToolHowToStep, ToolHowToStep, ToolHowToStep]` (**exactly 3 steps — type-enforced tuple**, line 162), `faqs: ToolFaq[]`, `relatedTools: [string, string, string, string]` (**exactly 4 slugs**, line 164), `popular: boolean`, `featured: boolean`, `rating: null`, `status: 'active' | 'coming-soon'`, `guide?: ToolGuide` (OPTIONAL — **only Compress PDF has one; this new tool must NOT have a `guide` field** — it uses the standard ToolPage layout).
+- **ToolPage rendering** (`src/pages/ToolPage.tsx`): "How to Use {tool.name}" from `tool.howTo` (3 steps), "About {tool.name}" from `longDescription`, "Frequently Asked Questions" via `<FaqAccordion faqs={tool.faqs} />`, FAQ JSON-LD via `buildFaqSchema(tool.faqs)`. The tool page does NOT render extra H2 content sections — all on-page SEO content lives in `longDescription` + `howTo` + `faqs` (see §1.1).
+- **Runners** (`src/components/tools/ActiveToolRunner.tsx`): category `'generators'` → `<LazyGeneratorToolsRunner tool={tool} />` (branch at line 104, runner at line 113). **No ActiveToolRunner change is needed** — just add the registry entry and the runner case below.
+  - `src/components/tools/GeneratorToolsRunner.tsx` (1,601 lines) is ONE file with inline components, dispatching via `switch (tool.slug)` (line 99): `case 'qr-code-generator':` (100), `case 'barcode-generator':` (102), `case 'password-generator':` (104), `case 'uuid-generator':` (106), `case 'slug-generator':` (108), `case 'random-name-generator':` (110), `case 'mac-address-generator':` (112), `case 'django-secret-key-generator':` (114), `case 'wordpress-secret-key-generator':` (116), `default:` (118). Add `case 'alphabets-to-word-generator':` in the same switch, following the existing pattern. Do not break any existing case.
+- **Generators** (`src/data/generatorTools.ts`, `GENERATOR_TOOLS`): 9 tools — QR Code Generator (`qr-code-generator`), Barcode Generator (`barcode-generator`), Password Generator (`password-generator`), UUID Generator (`uuid-generator`), Slug Generator (`slug-generator`), Random Name Generator (`random-name-generator`), MAC Address Generator (`mac-address-generator`), Django Secret Key Generator (`django-secret-key-generator`), WordPress Secret Key Generator (`wordpress-secret-key-generator`). Category entry (`src/data/tools.ts`, lines 433–469): id `'generators'`, name `'Generators'`, slug `'generators'`, url `'/generators'`, description `'Browser-based static QR codes, barcodes, Web Crypto passwords, bulk UUIDs, URL slugs, name lists, MACs, and Django/WordPress secrets.'`, intro `'Generators provides 9 fast, deterministic utilities running locally in your browser (NOT AI): static QR codes (never expire), retail Code 128/39/EAN-13/UPC-A barcodes (PNG/PDF), Web Crypto passwords, 1–1,000 v4 UUIDs, URL slugs, random English name lists, locally-administered test MAC addresses, Django SECRET_KEYs, and WordPress salts.'`, icon `'QrCode'`, seoTitle `` `Generators — 9 Browser Utilities | ${SITE_CONFIG.siteName}` ``, seoDescription `'Use 9 browser Generators: QR codes, barcodes, passwords, UUIDs, slugs, names, MACs, Django & WordPress secret keys.'`, 4 FAQs (Q1 'Do any tools in Generators use AI?' — answer says the generators run strictly deterministically, NOT AI, and mentions "wordlist randomizers"; Q2 'Do generated passwords, Django keys, or WordPress salts get saved or sent?'; Q3 'Do MAC Address Generator addresses belong to real physical hardware?'; Q4 'Will QR codes or barcodes carry a platform watermark?' — answer: all Generator downloads are completely unwatermarked).
+- **No overlapping tool exists on ToolPlatform:** there is NO anagram solver, NO word finder, NO unscrambler, NO word counter, NO character counter, NO text reverser, NO text case converter, NO random word generator, NO text generator, NO text analyzer, NO Scrabble word finder (0 hits for every one of those names/slugs in the registry and all category data files). The only text tools on the site are Text to Speech and Speech to Text (Developer Tools) — they are speech tools, NOT word tools, and are not related to this tool. This tool is genuinely new.
+- **Counts on the homepage:** `src/pages/HomePage.tsx:406` renders `Explore All {TOOLS.length} Tools` (**dynamic — renders 174 automatically once the tool is added**). `HomePage.tsx:60` (FAQ answer) and `:155` (seoDescription) also use `TOOLS.length` dynamically. `index.html` has a HARDCODED count: `'Explore 171 online tools across PDF, media, productivity, unit converter, number system, lookup, science, generator, developer, document, and finance suites.'` in 3 places (meta description, og:description, twitter:description — lines 9, 14, 22) — Batch 11 updates these to 173; this batch updates ALL THREE to **174** (see Section 2).
+- **⚠️ "174+ Free Tools" hero line — COULD NOT BE VERIFIED (pre-Batch-11 search).** A previous check claimed the homepage hero says "174+ Free Tools", but a fresh search found NO such string anywhere: 0 hits in `src/config/site.ts`, `src/App.tsx`, `src/pages/HomePage.tsx`, `src/components/Header.tsx`, `src/components/Footer.tsx`, `src/pages/AboutPage.tsx`, `src/pages/AllToolsPage.tsx`, `src/pages/CategoryPage.tsx`, `src/lib/seoFiles.ts`, `index.html`, and 0 exact hits in the live JS bundle. Do NOT invent a "174+ Free Tools" hero line. Section 2 orders you to search the rendered homepage for any "NNN+ Free Tools" count display: Batch 11 was ordered to update a "174+" display to "173+" if one exists — so after Batch 11 any such display reads "173+". If one exists now, update it to **"174+"** and report the file + line. If NO such display exists, report exactly that in the verification table.
+
+### 3.2 The master prompt as the spec (UtilityFlow — NOT built; the prompt below is the whole specification)
+
+The tool is **Alphabets to Word Generator** — it accepts letters from the user and generates real, valid English words that can be formed using those letters, from a genuine bundled English dictionary. **This is not a random word generator.** Every result must be a valid word supported by the integrated dictionary, satisfying the letter-frequency rule.
+
+- **Title / SEO (verbatim from the master prompt):** name `'Alphabets to Word Generator'`; URL `/alphabets-to-word-generator/`; primary keyword `'alphabets to word generator'`; SEO title `'Alphabets to Word Generator – Make Words from Letters'`; meta description `'Generate words from letters instantly with our free alphabets to word generator. Find short and long words, anagrams, and possible word combinations.'`; H1 `'Alphabets to Word Generator'`.
+- **Search intent:** users want to enter a collection of letters and discover meaningful English words that can be created from them.
+- **Core rule:** the generator must use each available letter no more times than it appears in the input. Example: input APPLE → valid words include APPLE, PEAL, LEAP, PALE, APE, LAP — the letter P cannot be used three times because the input contains only two P letters. Do not generate words that require unavailable letters.
+- **Keyword research (from the master prompt §9 — use these naturally in the copy; do NOT invent search volumes or keyword difficulty; do NOT add irrelevant keywords such as random password generators or baby name generators):** primary — `'alphabets to word generator'`, `'alphabet to word generator'`, `'letters to words generator'`, `'word generator from letters'`, `'generate words from letters'`; secondary — `'make words from letters'`, `'words from letters'`, `'letters to words'`, `'word finder from letters'`, `'word maker from letters'`, `'word builder from letters'`, `'generate words using letters'`, `'create words from letters'`, `'find words using letters'`, `'words you can make with letters'`, `'letter word generator'`, `'alphabet word maker'`, `'words generator using alphabets'`; anagram — `'anagram solver'`, `'anagram generator'`, `'find anagrams'`, `'anagram finder'`, `'anagrams from letters'`, `'word anagram solver'`, `'make anagrams from letters'`, `'unscramble letters'`, `'unscramble words'`, `'word unscrambler'`; word finder — `'word finder'`, `'letter unscrambler'`, `'word maker'`, `'word finder with letters'`, `'find possible words'`, `'longest word finder'`, `'short word finder'`, `'words starting with letters'`, `'words ending with letters'`, `'English word generator'`; long-tail — `'what words can I make with these letters'`, `'how to make words from letters'`, `'find all words from letters'`, `'generate words from random letters'`, `'make English words using given letters'`, `'find the longest word from letters'`, `'find words using all letters'`, `'create anagrams from a word'`, `'find words with specific letters'`, `'generate words from alphabet letters'`.
+
+### 3.3 What stays THE SAME (user order) vs what is WRITTEN FRESH
+
+- **SAME:** functionality (all 6 modes, the letter-frequency engine rules, all filters, all test values in §1.5); title, short description, keywords, seoTitle text, seoDescription text, H1, canonical URL `/alphabets-to-word-generator`; FAQ QUESTIONS (the 16 questions in §1.1 — they are the keyword-targeted questions users ask); the content topics (the 8 sections in §1.1) and the word-count band (1,500–2,000 words, measured as longDescription + howTo titles/descriptions + FAQ questions/answers — count by script, see Section 3).
+- **WRITTEN FRESH (mandatory — this is the whole point of the batch):** the longDescription, howTo step wording, and ALL FAQ ANSWERS are ORIGINAL copy written for ToolPlatform — there is no UtilityFlow copy to copy from (the UtilityFlow version was never built), and no sentence may be lifted from another site. If you are ever unsure whether a sentence is original, rewrite it again. The seoTitle/seoDescription/shortDescription stay verbatim because they are SEO metadata the user ordered unchanged — everything else on the page is fresh, original copy.
+- **ENGLISH ONLY.** ToolPlatform is English-only. The other 11 languages are shown as Coming Soon — NOT links, no routes, no sitemap entries, no hreflang. **Do NOT include locale files, locale overrides, or any i18n work in this build.**
+
+## 4. NON-NEGOTIABLE RULES
+
+1. **TEMPLATE / FORMULA-BASED ONLY. NO AI.** Do not call any AI model. No Gemini API, no API keys of any kind, no server-side calls, no external platform APIs, no network calls to any AI service. All word generation is deterministic, client-side dictionary matching. Never present dictionary output as AI-generated.
+2. **NO FAKE OUTPUTS.** Never use hardcoded demonstration results, random meaningless outputs, fake success messages, placeholder word lists, static sample responses presented as real results, buttons that do nothing, or artificial loading animations without actual processing. **Every button must perform its advertised action. Every input must influence the actual output. Every word shown must come from the bundled dictionary and satisfy the letter constraints — never hardcode the §1.5 test words as results.**
+3. **FIX THE PROMISES, NOT JUST THE CODE.** Where a tool page's How-to steps or FAQs promise a feature the workspace does not have, either implement the feature or rewrite the How-to/FAQ text so it promises ONLY what the workspace actually does. Never leave a documented promise unfulfilled.
+4. **PRESERVE ALL EXISTING URLs, SLUGS AND ROUTES.** Do not rename any tool, change any slug, or remove any tool. The new slug must be exactly `alphabets-to-word-generator` (Section 2 lesson). **The Most Popular 12 must NEVER change** — this new tool is `popular: false`, `featured: false`.
+5. **DO NOT BREAK WORKING TOOLS.** Reuse existing correct components and engines where they fit; do not rebuild unrelated pages. Do not redesign the site.
+6. **NO PRICING, NO EXPORT.** The pricing page and the Live Export View were removed from this site by the user and must stay removed. Do NOT re-add any pricing mention, promo, $11.99 / Lifetime Premium copy, Export button, export preview, or "Recent Results" export history on the new page. Verify at the end that none exist on the new page. (The tool's own **Download results as TXT** button — which downloads the generated word list as a plain .txt file — IS allowed: it is the tool's own direct download of what it produced, the same as other tools' own downloads. It is NOT the removed universal export system. Do NOT add any export panel, Export button, or PDF/CSV export around it.)
+7. **NO NEW DEPENDENCIES.** Use only packages already in `package.json`. No new libraries. The dictionary is a DATA asset, not a package — see §1.3.
+8. **HONEST LABELS ONLY.** State every limit honestly on the page (see the "Honest limits" list in §1.4). Never claim a feature the tool does not have. Never invent search volumes, keyword difficulty, or CPC data. Never claim exhaustive dictionary coverage unless the bundled list genuinely supports it.
+9. **CLEAN CODE.** Proper TypeScript types, modular tool logic, no unnecessary dependencies, no placeholder implementations left behind, no dead code. The build must pass with **0 TypeScript errors**.
+10. **RULE 8 — upload inputs:** this tool needs no file upload. Do NOT add any upload control to it.
+
+## Section 0 — Sync safety + BATCH 11 GUARD (do FIRST, before any edit)
+
+1. **BATCH 11 GUARD — CHECK FIRST.** Batch 11 (Roman Numeral Converter + Online Hourly Calculator) was sent to this same app just before this batch and must land FIRST. Before editing anything, confirm in the pulled workspace AND in the GitHub repo that the registry has **173 tools INCLUDING `roman-numeral-converter` and `online-hourly-calculator`**, and that the live sitemap has 197 URLs. **If Batch 11 has NOT landed (registry still 171 tools, or either slug missing), STOP the whole batch and report exactly that in your final report — do NOT build on the stale count, do NOT re-count from 171, do NOT touch Batch 11's files.**
+2. Pull the LATEST GitHub state into AI Studio first. The repo has newer files than the app workspace — the new tool must be built on top of the latest main, not on a stale copy. NOTE: a qpdf Protect/Unlock fix, a PDF Editor removal, a Compress PDF guide sample, a Sign PDF clean-stamp change, and Batch 11's two new tools have just landed on main (earlier tasks, same app) — pull latest and do NOT revert or overwrite their changes.
+3. Verify these two files are present in the workspace with EXACTLY this content:
+   - `public/_redirects` — exactly one line: `/* /index.html 200`
+   - `.npmrc` — exactly one line: `legacy-peer-deps=true`
+   If either file is missing or its content differs, restore it to exactly that content before editing anything else. Both files are load-bearing for the live deploy (SPA fallback + npm install).
+4. Verify `bun.lock` is ABSENT from the synced repo. It was deleted from GitHub as stale and must never come back. If the workspace still holds a copy of `bun.lock`, DELETE it now — never restore it, never sync it back to GitHub.
+5. Only after steps 1–4 pass, start the build in Section 1.
+
+## Section 1 — TOOL: ALPHABETS TO WORD GENERATOR (`alphabets-to-word-generator`)
+
+### 1.1 Registry entry (new entry in `src/data/generatorTools.ts`, `GENERATOR_TOOLS`)
+
+- `id: 'alphabets-to-word-generator'`, `name: 'Alphabets to Word Generator'`, `slug: 'alphabets-to-word-generator'`, `category: 'generators'`, `url: '/alphabets-to-word-generator'`.
+- `description` (verbatim, from the master prompt §8): `'Enter your letters and discover all the words you can make from them.'`
+- `keywords` (verbatim, all 10, in this order — every one appears in the master prompt §9): `'alphabets to word generator'`, `'alphabet to word generator'`, `'letters to words generator'`, `'word generator from letters'`, `'generate words from letters'`, `'make words from letters'`, `'words from letters'`, `'anagram solver'`, `'find anagrams'`, `'word finder from letters'`.
+- `icon`: a lucide-react icon name ALREADY used by another tool in the registry — grep the registry for existing `icon:` values and pick a fitting one; never invent an icon name.
+- `acceptedFormats: ['Letters']`, `maxFileSizeMB: null`, `maxFiles: null`, `processingMethod: 'browser'`.
+- `seoTitle` (master prompt SEO title + the ToolPlatform brand suffix, following the site's pattern): `` `Alphabets to Word Generator – Make Words from Letters | ${SITE_CONFIG.siteName}` ``
+- `seoDescription` (verbatim, master prompt meta description): `'Generate words from letters instantly with our free alphabets to word generator. Find short and long words, anagrams, and possible word combinations.'`
+- `howTo`: EXACTLY 3 steps (type-enforced tuple) — original wording, condensing: (1) enter your letters and pick one of the six modes, (2) adjust the filters (length, starting/ending letters, include/exclude) and generate, (3) copy the words you want or download them all as a TXT file.
+- `faqs`: EXACTLY the 16 questions below (same questions, in this order, from the master prompt §12) with **ORIGINAL answers written for ToolPlatform** — same facts, new words, explaining only what the tool actually does:
+  1. What is an alphabets to word generator?
+  2. How do I make words from letters?
+  3. Can I generate multiple words from one set of letters?
+  4. What is an anagram?
+  5. What is the difference between a word generator and an anagram solver?
+  6. Can I find the longest word from letters?
+  7. Can I find short words from letters?
+  8. Can I use repeated letters?
+  9. Does the generator use every letter?
+  10. Can I find words using all the letters?
+  11. Can I exclude specific letters?
+  12. Can I find words starting with a particular letter?
+  13. Does the tool work offline?
+  14. Is this word generator free?
+  15. Are all generated words valid English words?
+  16. Does the tool support every word game dictionary?
+- `relatedTools`: EXACTLY 4 slugs, all verified to exist in the registry by grep: `'password-generator'`, `'random-name-generator'`, `'slug-generator'` (all three verified in `generatorTools.ts`), plus ONE more relevant existing tool you verify yourself by grep — never invent a slug. (Do NOT list Word Counter, Character Counter, Text Reverser, Text Case Converter, Random Word Generator, Text Generator, Text Analyzer, or Scrabble Word Finder — NONE of them exist on ToolPlatform.)
+- `popular: false`, `featured: false`, `rating: null`, `status: 'active'`. NO `guide` field.
+- `longDescription`: ORIGINAL copy written for ToolPlatform (do NOT lift sentences from any other site). It must cover, in your own words, all 8 topics from the master prompt §11: (1) What Is an Alphabets to Word Generator? (2) How to Generate Words from Letters, step by step with examples; (3) How an Anagram Generator Works — exact anagrams and letter-frequency matching; (4) How to Find the Longest Words; (5) How to Find Short Words, with useful examples and practical applications; (6) Tips for Making More Words from Letters; (7) Examples of Words from Letters (LISTEN, APPLE, EARTH, STONE, CARE, ANGLE — only valid dictionary examples, verified against the bundled dictionary); (8) Who Can Use This Tool? (Students, Teachers, Word game players, English learners, Writers, Puzzle enthusiasts). Word-count band for the whole page's rendered content — longDescription + howTo titles/descriptions + FAQ questions/answers — is **1,500–2,000 words**. Count by script (see Section 3). The ToolPage renders this as the single "About {tool.name}" section — do NOT try to add separate H2 content sections; the 8 topics live inside the longDescription prose.
+
+### 1.2 Engine — new file `src/lib/wordGenerator.ts` (pure functions, letter-frequency matching)
+
+Implement these functions with EXACTLY this behaviour (write the code fresh in this codebase's style — the signatures and rules below are the specification):
+
+- `normalizeLetters(input: string): string` — uppercase the input, strip spaces and any non A–Z characters (the UI must still validate and show a clear message for numbers/symbols rather than silently dropping them — see `validateWordInput`).
+- `countLetterFrequency(text: string): Map<string, number>` — counts every letter in the normalized text.
+- `canBuildWord(word: string, availableLetters: Map<string, number>): boolean` — true only if every letter count the word needs is available; a letter may be used no more times than it appears in the input (e.g. APPLE has two P letters, so a word needing three P letters is rejected).
+- `findPossibleWords(letters: string): string[]` — every dictionary word buildable from the letters (any length from 2 up to the input length, subject to the active filters).
+- `findExactAnagrams(letters: string): string[]` — words whose complete letter-frequency map matches the input exactly (every supplied letter used, no letter omitted, no letter added, repeated letters handled correctly).
+- `filterWordsByLength(words: string[], min: number, max: number): string[]` — keeps words within the min/max length (inclusive).
+- `sortWords(words: string[], sortMode: 'alphabetical' | 'length-desc' | 'length-asc'): string[]` — alphabetical; longest first (ties alphabetical); shortest first (ties alphabetical).
+- `validateWordInput(input: string): { valid: boolean; error: string | null }` — rejects empty input, input containing numbers or symbols, and input longer than the documented maximum (see §1.4 — set the limit, e.g. 15 letters, and state it on the page). Accepts uppercase and lowercase (normalize to uppercase) and optional spaces between letters.
+- **Performance:** the engine must scan the dictionary efficiently (frequency maps, not per-word string searches). Cache the loaded dictionary in memory after the first load. Never load the dictionary into the initial page bundle — see §1.3.
+
+### 1.3 Dictionary — the biggest technical risk (read this whole section before choosing)
+
+- **Pick a legally usable English word list.** Before choosing: (1) verify its license; (2) confirm redistribution is allowed; (3) check word quality; (4) exclude obvious corrupted entries; (5) decide whether proper nouns are included; (6) decide whether abbreviations are included; (7) **document the dictionary source on the tool page** (name + license, in the About copy and near the results). If you cannot verify a list's license, do NOT use it — pick another one whose license you can verify. Never use a word list whose license you have not checked.
+- **Bundle it as a separate asset, LAZY-LOADED on the tool page only.** The dictionary must NOT be in the initial page bundle: load it as a separate asset (e.g. a data file under `public/` fetched on demand, or a dynamically `import()`-ed module chunk) only when the Alphabets to Word Generator page mounts. The tool must keep working without an internet connection after the page and dictionary assets have loaded. **No paid API. No external API call per search. No new npm dependencies — the dictionary is a data asset, not a package.**
+- **Verify EVERY test example against the actual bundled dictionary.** Run the §1.5 canonical values against the real bundled list in your tests. If a canonical example word (e.g. TINSEL, ENLIST) is missing from the dictionary you chose, pick a dictionary that contains ALL canonical examples — or report the gap honestly in your final report and adjust the affected test expectation to a word the dictionary genuinely contains. **Never hardcode example words as results to cover a dictionary gap.**
+- **Size report (mandatory, in the verification table):** report the dictionary asset size in bytes AND the initial bundle size, and prove the dictionary is NOT in the initial bundle (e.g. the dictionary loads as its own chunk/asset after the page mounts; the initial JS bundle does not grow by the dictionary size). If the dictionary is so large that the tool page becomes slow, pick a smaller, still-licensed list and report the trade-off honestly.
+- **Honesty:** do NOT claim exhaustive dictionary coverage unless the bundled list genuinely supports it. State on the page which dictionary is used and that different word games use different dictionaries — the tool does NOT guarantee acceptance in every word game.
+
+### 1.4 Tool UI — new case in `src/components/tools/GeneratorToolsRunner.tsx`
+
+Add `case 'alphabets-to-word-generator':` to the `switch (tool.slug)` (line 99), following the existing case pattern. Do not break any existing case. Six clearly accessible modes (tabs or pills):
+
+1. **Generate Words from Letters** — input "Enter letters (e.g. LISTEN)", Generate Words button, results showing every valid dictionary word possible within the selected filters, each with word + letter count + Copy button.
+2. **Find Anagrams** — words that use all supplied letters exactly once, respecting repeated-letter counts; clearly distinguish full anagrams from shorter words (shorter words must NOT appear in this mode's results).
+3. **Find Short Words** — filter to 2-, 3-, 4-, 5-letter words, plus custom minimum and maximum length; display valid words in organized groups.
+4. **Find Long Words** — sort by longest word first, display word length, show ALL words tied for maximum length, optional maximum number of results, show shorter alternatives.
+5. **Exact Letter Anagrams** — separate exact-anagram search: every supplied letter must be used, none omitted, none added, repeated letters handled correctly, results must be genuine dictionary entries.
+6. **Word Pattern Finder** — search with: required starting letter, required ending letter, letters that must be included, letters that must not be included, minimum word length, maximum word length, optional known letter positions. Explain the pattern support clearly on the page. Example: input letters PLANET, starts with P → PLANET.
+
+**Filters / advanced options (all mandatory, in a collapsible section if the page gets crowded — the primary generator stays immediately visible):** minimum word length; maximum word length; words beginning with a specific letter; words ending with a specific letter; include specific letters; exclude specific letters; sort alphabetically; sort by word length; longest words first; shortest words first; limit result count (set a documented default limit, e.g. 200 results, and state it on the page); reset filters. Changing filters must NOT require re-entering the letters.
+
+**Result display (all mandatory):** clean grid or list; each result shows word + character count + Copy button; Copy individual word; Copy all results; **Download results as TXT** (downloads the generated word list as a plain .txt file — the tool's own direct download, see Rule 6); alphabetical sorting; longest-first sorting; shortest-first sorting; total result count; Clear results; a useful empty state if no words are found (never display fake results).
+
+**Input / UX (from the master prompt §8):** main heading 'Alphabets to Word Generator'; description 'Enter your letters and discover all the words you can make from them.'; input placeholder 'Enter letters (e.g. LISTEN)'; primary button 'Generate Words'; secondary actions 'Find Anagrams', 'Clear', 'Copy All'. Spacious input area; large readable result text; comfortable button spacing; clearly visible filters; responsive layout; professional typography; accessible controls; helpful validation messages; no horizontal scrolling on mobile. **Session history is NOT part of this tool — do NOT invent it.** Keep all calculations client-side — never send user input to a server. Do not require registration.
+
+**Honest limits (state these on the page):** results come only from the bundled dictionary (name it) — a word the dictionary does not contain will not appear; different word games use different dictionaries, so the tool does not guarantee acceptance in every game; input has a documented maximum letter count (state the number you set); results are capped at the documented default limit (state the number); an exact anagram uses every letter — if no word uses all of them, the result is an honest empty state, not a shorter word.
+
+### 1.5 Canonical TEST VALUES (verification table — these stay the same; they are facts, not copy)
+
+- LISTEN → LISTEN, SILENT, ENLIST, TINSEL, INLETS (all must appear in Generate Words and in Exact Anagrams).
+- APPLE → APPLE, PALE, PEAL, LEAP, APE, LAP (P used max twice — no word needing three P letters may appear).
+- EARTH → EARTH, HEART, HATER.
+- STONE → STONE, NOTES, ONSET, TONES.
+- CARE → CARE, RACE, ACRE.
+- ANGLE (content example — verify it resolves to real dictionary words).
+- PLANET with starts-with P → PLANET.
+- Edge cases: repeated letters; one-letter input; empty input (clear message, no results); numbers and symbols (clear message, no results); uppercase and lowercase (same results); very long input (over the documented maximum → clear limit message); no matching words (honest empty state); exact-anagram mode (only full anagrams, never shorter words); minimum and maximum length filters; starting and ending letters; include and exclude filters; copy individual results; copy all; Download TXT (real .txt file with the results); mobile and desktop responsiveness.
+
+## Section 2 — COUNTS, CATEGORY PAGE & SITE-WIDE UPDATES (do these as part of the batch)
+
+1. **Tool count 173 → 174.** The homepage `Explore All {TOOLS.length} Tools` (HomePage.tsx:406) and the `TOOLS.length` uses at HomePage.tsx:60 and :155 are dynamic — verify they render **174** after the build. Do NOT hardcode the number anywhere dynamic code already computes it.
+2. **`index.html` — hardcoded count (3 places, lines 9, 14, 22):** after Batch 11 these read `'Explore 173 online tools across PDF, media, productivity, unit converter, number system, lookup, science, generator, developer, document, and finance suites.'` — update ALL THREE occurrences to **174** (meta description, og:description, twitter:description). Verify by grep afterwards: 0 remaining `173 online tools` in the repo.
+3. **Generators category** (`src/data/tools.ts`, lines 433–469): update the category entry for 9 → 10 tools —
+   - description: `'Browser-based static QR codes, barcodes, Web Crypto passwords, bulk UUIDs, URL slugs, name lists, MACs, and Django/WordPress secrets.'` → add letter-to-word generation (e.g. "…, Django/WordPress secrets, and letter-to-word generation").
+   - intro: `'Generators provides 9 fast, deterministic utilities running locally in your browser (NOT AI): …'` → **10** tools, reworded to add the Alphabets to Word Generator honestly (dictionary-based word finder from your letters — anagrams, short/long words, pattern search — pure formula, NOT AI).
+   - seoTitle: `` `Generators — 9 Browser Utilities | ${SITE_CONFIG.siteName}` `` → **10**.
+   - seoDescription: `'Use 9 browser Generators: QR codes, barcodes, passwords, UUIDs, slugs, names, MACs, Django & WordPress secret keys.'` → **10** tools, adding the word generator.
+   - Category FAQs (4): none states a count — leave them as-is unless a count sneaks in; verify by grep. (Q1's "wordlist randomizers" refers to the Random Name Generator — it stays true; do not rewrite it to mean this tool.)
+4. **"NNN+ Free Tools" hero line — search, do NOT invent.** Open the rendered homepage in the preview and search the whole rendered page AND grep the codebase for a `NNN+` tool-count display. Batch 11 was ordered to update a "174+" display to "173+" if one exists — so after Batch 11 any such display reads "173+". If a count display exists now (expected "173+ Free Tools"), update it to **"174+ Free Tools"** and report the file + line. If NO such display exists, report exactly that in the verification table — **do NOT invent or add a new "174+ Free Tools" hero line**.
+5. **Sitemap 197 → 198 URLs.** The sitemap is generated at build time from the registry (`src/lib/seoFiles.ts`, `generateSitemapXml()`). Verify the BUILT `dist/sitemap.xml` contains **198 `<loc>` entries** including `/alphabets-to-word-generator`, and 0 entries for any removed tool. The sitemap's base domain is the pre-existing placeholder (`toolplatform.example.com`) — do NOT change the base domain in this batch; that is a separate, undecided domain decision.
+6. **Search + category page:** verify the site search finds the new tool by name and by keyword (`alphabets`, `anagram`, `word`), the Generators category page lists 10 tools, and `/tools` shows "Showing 174 of 174 tools".
+
+## Section 3 — CHECKS (run and report all of them)
+
+1. Run `tsc --noEmit` — must be **0 errors**.
+2. Run a production build — must pass. Confirm the built `dist/sitemap.xml` has **198 `<loc>` entries** (Section 2.5).
+3. Run Vitest — **all tests must pass**, including the NEW test file below. A failing test means a reference was missed — find and fix it, do not delete or weaken a test to make it pass.
+   - New file `src/lib/__tests__/wordGenerator.test.ts`: `normalizeLetters` / `countLetterFrequency` / `canBuildWord` / `findPossibleWords` / `findExactAnagrams` / `filterWordsByLength` / `sortWords` / `validateWordInput` for every value in §1.5 — LISTEN (LISTEN, SILENT, ENLIST, TINSEL, INLETS all present; exact-anagram mode returns ONLY full anagrams), APPLE (APPLE, PALE, PEAL, LEAP, APE, LAP; no word needing three P letters), EARTH (EARTH, HEART, HATER), STONE (STONE, NOTES, ONSET, TONES), CARE (CARE, RACE, ACRE); repeated letters; one-letter input; empty input rejected; numbers/symbols rejected; lowercase = uppercase; over-limit input rejected; no-matching-words case; min/max length; start/end letters; include/exclude filters. **All engine tests must run against the REAL bundled dictionary — never a stub word list.**
+4. **Grep proof:** (a) `alphabets-to-word-generator` appears exactly where it should (registry entry, runner case, sitemap) and nowhere it should not; (b) 0 remaining `173 online tools` in the repo; (c) 0 pricing mentions (`pricing`, `$11.99`, `Lifetime Premium`, `Export` button/preview) on the new page; (d) 0 locale/i18n files added for this tool (grep for new files under `src/locales/` — there must be none); (e) the dictionary is NOT statically imported by the initial bundle (grep the initial bundle entry for the dictionary asset name — it must load only on the tool page).
+5. **Word-count proof (by script, not by eye):** count the words in the new tool's registry entry — longDescription + howTo titles/descriptions + FAQ questions/answers. It must be **1,500–2,000 words**. Report the exact counted number. If it is outside the band, adjust the FAQ answers (add/remove genuinely useful detail — never pad with filler) until it is inside.
+6. **Dictionary proof (by script + build output):** report the dictionary asset's size in bytes, the initial bundle size, and the asset path; confirm the dictionary loads as its own chunk/asset after the tool page mounts (state how you verified it). Report the dictionary's name, license, and source as documented on the page.
+7. Confirm `public/_redirects` still contains exactly `/* /index.html 200`, `.npmrc` still contains exactly `legacy-peer-deps=true`, and `bun.lock` is still absent.
+
+## Section 4 — LIVE VERIFICATION (in the preview, do each yourself)
+
+Use the preview (not the model workspace) for every step. Report a table: Item | Expected | Result. One row per item (use the rows in the Section 5 table below). Do NOT claim "all passed" unless every item was actually checked. Report exact numbers and exact outputs you observed.
+
+1. (a) Page loads with all 6 mode pills; no console errors; the dictionary loads as a separate asset (note the asset name/size you observed in the network panel).
+2. (b) LISTEN → results include LISTEN, SILENT, ENLIST, TINSEL, INLETS.
+3. (c) APPLE → results include APPLE, PALE, PEAL, LEAP, APE, LAP; confirm NO result uses P three times.
+4. (d) EARTH → HEART and HATER appear; STONE → NOTES, ONSET, TONES appear; CARE → RACE and ACRE appear.
+5. (e) Exact Anagrams mode with LISTEN → ONLY full anagrams (LISTEN, SILENT, ENLIST, TINSEL, INLETS) — no shorter words.
+6. (f) Short Words mode with LISTEN, max length 3 → only 2–3 letter words; Long Words mode → longest first, all words tied for maximum length shown.
+7. (g) Pattern Finder: PLANET with starts-with P → PLANET; include/exclude filters change the results; min/max length filters change the results.
+8. (h) Edge cases: empty input → clear message, no results; input with numbers/symbols → clear message; one-letter input → handled gracefully; over-limit input → clear limit message; an input with no matching words → honest empty state.
+9. (i) Copy individual word works (clipboard receives the word); Copy All works; Download TXT downloads a real .txt file containing the results (open it and confirm the words are inside).
+10. (j) The page states the dictionary source + license and the honest limits (no guarantee of acceptance in every word game; input maximum; result limit).
+11. (k) Mobile width (375px): the tool fits with zero horizontal overflow.
+12. (l) Confirm NO pricing mentions, NO $11.99 promo, NO Export button / export preview on the new page; confirm NO locale/language switcher content and NO non-English text.
+13. (m) Spot-check that nothing else broke: open one existing tool from the Generators category (e.g. Password Generator) and confirm it works as before; open one Batch 11 tool (Roman Numeral Converter) and confirm it still works.
+
+## Section 5 — SYNC TO GITHUB + VERIFICATION TABLE
+
+1. ONLY after every check in Sections 3–4 passes, sync to GitHub repo **bilalayyah/toolplatform-live**, branch **main**. Verify the sync landed: the repo must show the edited/added files, `.npmrc` and `public/_redirects` present with their exact content, and `bun.lock` absent.
+2. Do NOT deploy to Cloudflare. Do NOT create a new repo. Do NOT push to the old `bilalayyah/toolplatform` repo.
+3. Fill in this verification table from your own live checks (do not copy expected values into the result column — report what you actually observed):
+
+| Item | Expected | Result |
+|---|---|---|
+| Section 0: Batch 11 guard | Registry has 173 tools incl. roman-numeral-converter + online-hourly-calculator | |
+| Section 0: latest GitHub state pulled | Workspace matches main | |
+| Section 0: `public/_redirects` | Exactly `/* /index.html 200` | |
+| Section 0: `.npmrc` | Exactly `legacy-peer-deps=true` | |
+| Section 0: `bun.lock` | Absent | |
+| Slug re-checked against registry | FREE, no rename/substitution | |
+| Registry entry | In `generatorTools.ts`, all fields per §1.1 | |
+| Engine | `src/lib/wordGenerator.ts`, all §1.2 functions | |
+| Dictionary | Name + license + source documented on the page | |
+| Dictionary asset size | Bytes (exact number) | |
+| Initial bundle size | Bytes (exact number) | |
+| Dictionary lazy-loaded | Separate chunk/asset, NOT in the initial bundle (how verified) | |
+| Runner case | `GeneratorToolsRunner.tsx`, all 9 existing cases intact | |
+| FAQs | Exactly 16, questions as listed | |
+| Word count (script) | 1,500–2,000 — exact number | |
+| Category update | Generators 9→10 (intro/seoTitle/seoDescription) | |
+| `index.html` count | 0 remaining `173 online tools` (3 places → 174) | |
+| "NNN+" hero search | Found → updated to "174+" (file:line) OR not found (state so) | |
+| Sitemap (built) | 198 `<loc>` incl. `/alphabets-to-word-generator` | |
+| No locale files | 0 new files under `src/locales/` | |
+| `tsc --noEmit` | 0 errors | |
+| Production build | Passes | |
+| Vitest | All tests pass incl. new engine tests (real dictionary) | |
+| Live: LISTEN | SILENT, ENLIST, TINSEL, INLETS present | |
+| Live: APPLE | APPLE, PALE, PEAL, LEAP, APE, LAP; no 3×P word | |
+| Live: EARTH / STONE / CARE | HEART, HATER / NOTES, ONSET, TONES / RACE, ACRE | |
+| Live: exact anagrams | Only full anagrams, no shorter words | |
+| Live: short / long modes | Length filters + longest-first work | |
+| Live: pattern finder | PLANET via starts-with P; include/exclude work | |
+| Live: edge cases | Empty / numbers / 1-letter / over-limit / no-match handled | |
+| Live: copy individual / copy all | Both work | |
+| Live: Download TXT | Real .txt with the results (verified by opening it) | |
+| Live: dictionary + limits stated | Source/license + honest limits visible on the page | |
+| Live: mobile 375px | Zero horizontal overflow | |
+| Homepage / /tools counts | "Explore All 174 Tools" / "Showing 174 of 174 tools" | |
+| Search | `alphabets` → Alphabets to Word Generator | |
+| Category page | Generators lists 10 tools | |
+| No pricing / export UI | None on the new page | |
+| No non-English content | English only on the page | |
+| Spot-checks | Password Generator + Roman Numeral Converter work as before | |
+| GitHub sync | Landed on `bilalayyah/toolplatform-live` main (commit hash) | |
+
+4. ⚠️ BATCH 3 LESSON (again, at the end because it matters): check every file path, line number, state name, and slug against the actual code FIRST, stop and report any mismatch, never substitute, rename, or invent. If anything named in this prompt does not exist in the repo, say so in the report and do NOT guess a replacement. If the slug already exists in the registry, STOP and report it — never build it under a different slug.
+
+Work in DESKTOP mode. Use FREE models only — try Gemini 4 Hydrogen first; if it hits its daily limit, try the other free models. Never use a paid model. If every free model shows a daily limit, stop and report the reset times.

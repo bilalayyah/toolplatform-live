@@ -436,13 +436,13 @@ export const CATEGORIES: readonly ToolCategory[] = [
     slug: 'generators',
     url: '/generators',
     description:
-      'Browser-based static QR codes, barcodes, Web Crypto passwords, bulk UUIDs, URL slugs, name lists, MACs, and Django/WordPress secrets.',
+      'Browser-based static QR codes, barcodes, Web Crypto passwords, bulk UUIDs, URL slugs, name lists, MACs, Django/WordPress secrets, and dictionary word generation.',
     intro:
-      'Generators provides 9 fast, deterministic utilities running locally in your browser (NOT AI): static QR codes (never expire), retail Code 128/39/EAN-13/UPC-A barcodes (PNG/PDF), Web Crypto passwords, 1–1,000 v4 UUIDs, URL slugs, random English name lists, locally-administered test MAC addresses, Django SECRET_KEYs, and WordPress salts.',
+      'Generators provides 10 fast, deterministic utilities running locally in your browser (NOT AI): static QR codes (never expire), retail Code 128/39/EAN-13/UPC-A barcodes (PNG/PDF), Web Crypto passwords, 1–1,000 v4 UUIDs, URL slugs, random English name lists, locally-administered test MAC addresses, Django SECRET_KEYs, WordPress salts, and dictionary-backed letter-to-word / anagram finding.',
     icon: 'QrCode',
-    seoTitle: `Generators — 9 Browser Utilities | ${SITE_CONFIG.siteName}`,
+    seoTitle: `Generators — 10 Browser Utilities | ${SITE_CONFIG.siteName}`,
     seoDescription:
-      'Use 9 browser Generators: QR codes, barcodes, passwords, UUIDs, slugs, names, MACs, Django & WordPress secret keys.',
+      'Use 10 browser Generators: QR codes, barcodes, passwords, UUIDs, slugs, names, MACs, Django & WordPress keys, and word finder.',
     faqs: [
       {
         question: 'Do any tools in Generators use AI?',

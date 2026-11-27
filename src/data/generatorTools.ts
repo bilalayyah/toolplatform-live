@@ -677,4 +677,144 @@ export const GENERATOR_TOOLS: readonly Tool[] = [
     rating: null,
     status: 'active',
   },
+  {
+    id: 'alphabets-to-word-generator',
+    name: 'Alphabets to Word Generator',
+    slug: 'alphabets-to-word-generator',
+    category: 'generators',
+    url: '/alphabets-to-word-generator',
+    description:
+      'Enter your letters and discover all the words you can make from them.',
+    longDescription:
+      'What Is an Alphabets to Word Generator? An alphabets to word generator is a deterministic browser utility that transforms a loose set of letters into real, valid English words backed by a bundled lexicon—never random gibberish and never guessed by AI. Whenever you have scrambled tiles, jumbled puzzle clues, or a collection of alphabet letters, our word generator from letters scans 274,137 verified English entries from the open Letterpress English Word List (atebits/Words, CC0 1.0 Universal Public Domain / sindresorhus word-list, MIT license) to reveal every legitimate word you can build. Unlike a random word generator that invents synthetic strings, every result produced by this alphabet to word generator is checked strictly against both the dictionary and your input letter counts. How to Generate Words from Letters: Making English words using given letters takes three straightforward steps inside your browser. First, type or paste up to 15 alphabet characters (A–Z, uppercase or lowercase, with optional spaces) into the workspace box—for example, LISTEN or APPLE—and pick one of six specialized search modes: Generate Words, Find Anagrams, Find Short Words, Find Long Words, Exact Letter Anagrams, or Word Pattern Finder. Second, refine your search using optional filters including minimum and maximum word length, starting or ending letters, letters to include or exclude, known positional patterns such as P_A___, sort order, and display cap (defaulting to 200 results and adjustable up to 1,000). Third, click Generate Words to view matching dictionary words alongside character counts, copy individual words or the entire list to your clipboard, or download the list directly as a plain TXT file. How an Anagram Generator Works: At the core of our letters to words generator and anagram solver is exact letter-frequency matching. Before evaluating any dictionary entry, the engine counts how many times each letter appears in your input. A candidate word passes only if every letter it requires exists in your supply at least as many times as the word demands. Consider the input APPLE: it contains one A, two Ps, one L, and one E. Therefore, valid words you can make with letters from APPLE include APPLE, PALE, PEAL, LEAP, APE, and LAP, whereas a word needing three Ps or two As is rejected automatically. In Find Anagrams and Exact Letter Anagrams modes, the anagram finder goes one step further and compares the complete letter-frequency signature so every supplied character is used exactly once with none omitted and none added—turning LISTEN into LISTEN, SILENT, ENLIST, TINSEL, and INLETS while keeping shorter subset words out of exact-anagram results. How to Find the Longest Words: When you want to maximize word length in puzzle boards or vocabulary challenges, switch to Find Long Words mode or sort results with Longest Words First. Our longest word finder prioritizes full-length matches and highlights every dictionary word tied for the maximum character count at the top of your results, followed cleanly by shorter alternatives underneath so you never miss high-scoring plays when a single full-length word is unavailable. How to Find Short Words: Short words are essential for tight puzzle grids, parallel plays, and early vocabulary building. Using Find Short Words mode—our dedicated short word finder—you can switch between 2-, 3-, 4-, and 5-letter presets or set custom minimum and maximum lengths to browse organized word groups by character count. Discovering 2-letter and 3-letter words like APE and LAP from longer racks opens tight board hooks, helps students recognize common roots and suffixes, and builds confidence with compact word patterns. Tips for Making More Words from Letters: To get stronger results when you unscramble letters or explore word combinations, start by pairing vowels with versatile consonants such as S, T, R, N, and L, and test common prefixes or endings in Word Pattern Finder using the Starts With, Ends With, and Known Positions pattern syntax (for instance, typing PLANET with Starts With P or pattern P_A___ surfaces PLANET immediately). Use Include and Exclude filters when a crossword or puzzle board locks specific slots or eliminates unused letters, and experiment with repeated letters to uncover longer derivatives. Examples of Words from Letters: Verified directly against our bundled Letterpress English dictionary, common letter sets yield rich word families: LISTEN unscrambles into exact 6-letter anagrams LISTEN, SILENT, ENLIST, TINSEL, and INLETS alongside shorter words; APPLE builds APPLE, PALE, PEAL, LEAP, APE, and LAP while respecting the two-P cap; EARTH forms HEART and HATER alongside EARTH; STONE yields NOTES, ONSET, and TONES alongside STONE; CARE generates RACE and ACRE alongside CARE; and ANGLE produces ANGLE, ANGEL, GLEAN, GLEN, LEAN, LANE, AGE, and ALE. Who Can Use This Tool? This English word generator serves students practicing spelling and vocabulary recognition, teachers preparing classroom word-building exercises and printable TXT handouts, word game players looking up valid combinations or checking letter unscrambler possibilities, English learners exploring real word structures and letter-frequency constraints, writers brainstorming concise lexical alternatives, and puzzle enthusiasts solving anagrams and pattern clues locally without registration or server uploads. Honest Limits & Scope: Because this utility relies exclusively on the bundled 274,137-word Letterpress English Word List (lowercase A–Z words of 2 or more letters, excluding capitalized proper nouns, hyphenated phrases, and punctuated abbreviations), words missing from that lexicon do not appear, and different word games enforce their own distinct official dictionaries—so acceptance in every word game cannot be guaranteed. All processing stays strictly client-side in your browser, input accepts up to 15 letters, and displayed results default to a 200-word cap (adjustable up to 1,000 in Filters) to keep scrolling fast across desktop and mobile screens.',
+    keywords: [
+      'alphabets to word generator',
+      'alphabet to word generator',
+      'letters to words generator',
+      'word generator from letters',
+      'generate words from letters',
+      'make words from letters',
+      'words from letters',
+      'anagram solver',
+      'find anagrams',
+      'word finder from letters',
+    ],
+    icon: 'Type',
+    acceptedFormats: ['Letters'],
+    maxFileSizeMB: null,
+    maxFiles: null,
+    processingMethod: 'browser',
+    seoTitle: `Alphabets to Word Generator – Make Words from Letters | ${SITE_CONFIG.siteName}`,
+    seoDescription:
+      'Generate words from letters instantly with our free alphabets to word generator. Find short and long words, anagrams, and possible word combinations.',
+    howTo: [
+      {
+        title: 'Enter your letters and pick a mode',
+        description:
+          'Type up to 15 English letters (A–Z) into the workspace and select one of six modes: Generate Words, Find Anagrams, Find Short Words, Find Long Words, Exact Letter Anagrams, or Word Pattern Finder.',
+      },
+      {
+        title: 'Adjust filters and generate words',
+        description:
+          'Optionally filter by word length, starting or ending letters, required or excluded letters, known letter positions, sorting order, and result limit, then click Generate Words.',
+      },
+      {
+        title: 'Copy results or download TXT',
+        description:
+          'Review matching dictionary words with character counts, copy single words or the full list to your clipboard, or save everything directly as a plain TXT file.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'What is an alphabets to word generator?',
+        answer:
+          'An alphabets to word generator is a browser-based word finder from letters that checks every entry in a bundled English dictionary against the exact letters you enter. Instead of inventing random letter sequences, it lists genuine English words you can spell using only your available characters.',
+      },
+      {
+        question: 'How do I make words from letters?',
+        answer:
+          'Type your letters into the input box (for example, LISTEN or APPLE), choose Generate Words or any specialized mode, optionally apply length or letter filters, and click Generate Words. Matching words appear instantly in a clean grid with character counts and copy buttons.',
+      },
+      {
+        question: 'Can I generate multiple words from one set of letters?',
+        answer:
+          'Yes. In Generate Words, Find Short Words, Find Long Words, and Word Pattern Finder modes, the engine returns all valid dictionary combinations from 2 letters up to your full input length, displaying up to 200 results by default (and up to 1,000 when adjusted in Filters).',
+      },
+      {
+        question: 'What is an anagram?',
+        answer:
+          'An anagram is a valid word formed by rearranging every single letter of another word or letter set without adding new letters or leaving any behind. For instance, SILENT, ENLIST, TINSEL, and INLETS are exact anagrams of LISTEN, while HEART and HATER are exact anagrams of EARTH.',
+      },
+      {
+        question: 'What is the difference between a word generator and an anagram solver?',
+        answer:
+          'A general word generator from letters finds both shorter subset words and full-length combinations from your letter pool, whereas an anagram solver narrows results exclusively to words that consume every supplied letter at its exact frequency—never listing shorter partial words.',
+      },
+      {
+        question: 'Can I find the longest word from letters?',
+        answer:
+          'Yes. Switch to Find Long Words mode or select Longest Words First in the sort dropdown. Find Long Words places every dictionary entry tied for the maximum available length in a highlighted top group and shows shorter alternatives underneath.',
+      },
+      {
+        question: 'Can I find short words from letters?',
+        answer:
+          'Yes. Open Find Short Words mode to filter directly to 2-, 3-, 4-, or 5-letter words using the preset buttons or custom min/max controls, with matching results organized clearly into groups by word length.',
+      },
+      {
+        question: 'Can I use repeated letters?',
+        answer:
+          'Yes, and the engine tracks repeated letters strictly according to how many times each letter appears in your input. Entering APPLE gives you two Ps, so words like APPLE, PALE, and PEAL are valid while any word requiring a third P or a second A is excluded.',
+      },
+      {
+        question: 'Does the generator use every letter?',
+        answer:
+          'That depends on which mode you pick. Generate Words, Find Short Words, Find Long Words, and Word Pattern Finder allow shorter subset words starting at 2 letters, whereas Find Anagrams and Exact Letter Anagrams require every supplied letter to be used once.',
+      },
+      {
+        question: 'Can I find words using all the letters?',
+        answer:
+          'Yes. Use Find Anagrams or Exact Letter Anagrams (or click the Find Anagrams action button) to find only exact full-length matches that use every letter in your input. If no English word uses all your letters, the tool shows an honest empty state instead of shorter words.',
+      },
+      {
+        question: 'Can I exclude specific letters?',
+        answer:
+          'Yes. Expand the Filters & Pattern panel and type letters into the Must Exclude Letters field to filter out any candidate word containing those characters—without having to re-type your main letter set.',
+      },
+      {
+        question: 'Can I find words starting with a particular letter?',
+        answer:
+          'Yes. Enter one or more starting letters in the Starts With filter (or use Word Pattern Finder with known positions such as P_A___ for PLANET) to restrict results to words beginning with that exact prefix.',
+      },
+      {
+        question: 'Does the tool work offline?',
+        answer:
+          'Yes, after loading. When you open the Alphabets to Word Generator page, the bundled dictionary file is fetched once into your browser memory as a separate asset, so subsequent searches, filter changes, and TXT downloads continue working locally without sending data to any server.',
+      },
+      {
+        question: 'Is this word generator free?',
+        answer:
+          'Yes. Alphabets to Word Generator is completely free to use in your browser with no account registration, no usage quotas, and no watermarks.',
+      },
+      {
+        question: 'Are all generated words valid English words?',
+        answer:
+          'Every output comes directly from our bundled 274,137-word Letterpress English Word List (CC0 1.0 Universal / MIT), which contains lowercase alphabetic English words of two or more letters and excludes random strings, capitalized proper nouns, and punctuated abbreviations.',
+      },
+      {
+        question: 'Does the tool support every word game dictionary?',
+        answer:
+          'No. Different word games and tournaments maintain separate official word lists (such as TWL, CSW, or custom app lexicons). While the Letterpress list covers a broad English vocabulary, word acceptance in every specific word game is not guaranteed.',
+      },
+    ],
+    relatedTools: [
+      'password-generator',
+      'random-name-generator',
+      'slug-generator',
+      'uuid-generator',
+    ],
+    popular: false,
+    featured: false,
+    rating: null,
+    status: 'active',
+  },
 ];
