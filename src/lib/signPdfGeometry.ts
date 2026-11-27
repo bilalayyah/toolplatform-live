@@ -70,17 +70,11 @@ export function getSignatureBoundsPt(
   imgHeightPt: number,
   pageWidth: number,
   pageHeight: number,
-  includeStampBadge: boolean,
 ): { minX: number; maxX: number; minY: number; maxY: number } {
-  const leftPad = includeStampBadge ? 10 : 0;
-  const rightPad = includeStampBadge ? 10 : 0;
-  const bottomPad = includeStampBadge ? 12 : 0;
-  const topPad = includeStampBadge ? 28 : 0;
-
-  const minX = leftPad;
-  const maxX = Math.max(minX, pageWidth - imgWidthPt - rightPad);
-  const minY = bottomPad;
-  const maxY = Math.max(minY, pageHeight - imgHeightPt - topPad);
+  const minX = 0;
+  const maxX = Math.max(minX, pageWidth - imgWidthPt);
+  const minY = 0;
+  const maxY = Math.max(minY, pageHeight - imgHeightPt);
 
   return { minX, maxX, minY, maxY };
 }
@@ -92,14 +86,12 @@ export function clampSignaturePositionPt(
   imgHeightPt: number,
   pageWidth: number,
   pageHeight: number,
-  includeStampBadge: boolean,
 ): { x: number; y: number } {
   const { minX, maxX, minY, maxY } = getSignatureBoundsPt(
     imgWidthPt,
     imgHeightPt,
     pageWidth,
     pageHeight,
-    includeStampBadge,
   );
   const safeX = Number.isFinite(x) ? x : minX;
   const safeY = Number.isFinite(y) ? y : minY;
@@ -117,7 +109,6 @@ export function resolveSignaturePositionPt(
   imgHeightPt: number,
   pageWidth: number,
   pageHeight: number,
-  includeStampBadge: boolean,
 ): { x: number; y: number } {
   let rawX = pageWidth - imgWidthPt - 40;
   let rawY = 40;
@@ -143,7 +134,6 @@ export function resolveSignaturePositionPt(
     imgHeightPt,
     pageWidth,
     pageHeight,
-    includeStampBadge,
   );
 }
 
@@ -152,26 +142,20 @@ export function computeSignatureBoxRectPt(
   y: number,
   imgWidthPt: number,
   imgHeightPt: number,
-  includeStampBadge: boolean,
 ): SignatureBoxRectPt {
-  const leftPadPt = includeStampBadge ? 10 : 0;
-  const rightPadPt = includeStampBadge ? 10 : 0;
-  const bottomPadPt = includeStampBadge ? 12 : 0;
-  const topPadPt = includeStampBadge ? 28 : 0;
-
   return {
     x,
     y,
     imgWidthPt,
     imgHeightPt,
-    outerLeftPt: x - leftPadPt,
-    outerBottomPt: y - bottomPadPt,
-    outerWidthPt: imgWidthPt + leftPadPt + rightPadPt,
-    outerHeightPt: imgHeightPt + bottomPadPt + topPadPt,
-    leftPadPt,
-    rightPadPt,
-    bottomPadPt,
-    topPadPt,
+    outerLeftPt: x,
+    outerBottomPt: y,
+    outerWidthPt: imgWidthPt,
+    outerHeightPt: imgHeightPt,
+    leftPadPt: 0,
+    rightPadPt: 0,
+    bottomPadPt: 0,
+    topPadPt: 0,
   };
 }
 
@@ -204,7 +188,6 @@ export function applyPointerDeltaToPositionPt(
   imgHeightPt: number,
   pageWidth: number,
   pageHeight: number,
-  includeStampBadge: boolean,
 ): { x: number; y: number } {
   const safePreviewW = Math.max(1, previewWidthPx);
   const safePreviewH = Math.max(1, previewHeightPx);
@@ -217,7 +200,6 @@ export function applyPointerDeltaToPositionPt(
     imgHeightPt,
     pageWidth,
     pageHeight,
-    includeStampBadge,
   );
   return {
     x: Math.round(clamped.x),

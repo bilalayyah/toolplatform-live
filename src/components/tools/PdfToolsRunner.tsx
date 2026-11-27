@@ -334,9 +334,6 @@ export function PdfToolsRunner({tool}: Props) {
   const [signPosition, setSignPosition] = useState<SignPositionPreset>('bottom-right');
   const [signCustomX, setSignCustomX] = useState<number>(40);
   const [signCustomY, setSignCustomY] = useState<number>(40);
-  const [signerName, setSignerName] = useState<string>('Authorized Signer');
-  const [signDate, setSignDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [includeStampBadge, setIncludeStampBadge] = useState<boolean>(true);
   const [signScale, setSignScale] = useState<number>(1);
   const [hasDrawn, setHasDrawn] = useState<boolean>(false);
   const [drawnSigDataUrl, setDrawnSigDataUrl] = useState<string | null>(null);
@@ -424,9 +421,6 @@ export function PdfToolsRunner({tool}: Props) {
     setSignPosition('bottom-right');
     setSignCustomX(40);
     setSignCustomY(40);
-    setSignerName('Authorized Signer');
-    setSignDate(new Date().toISOString().split('T')[0]);
-    setIncludeStampBadge(true);
     setSignScale(1);
     setHasDrawn(false);
     setDrawnSigDataUrl(null);
@@ -802,14 +796,12 @@ export function PdfToolsRunner({tool}: Props) {
       imgSize.imgHeightPt,
       signPreviewPageSize.width,
       signPreviewPageSize.height,
-      includeStampBadge,
     );
     const box = computeSignatureBoxRectPt(
       resolved.x,
       resolved.y,
       imgSize.imgWidthPt,
       imgSize.imgHeightPt,
-      includeStampBadge,
     );
     const overlayPct = signatureBoxToOverlayPct(
       box,
@@ -822,7 +814,7 @@ export function PdfToolsRunner({tool}: Props) {
       box,
       overlayPct,
     };
-  }, [signPreviewPageSize, activeSignaturePreview, signScale, signPosition, signCustomX, signCustomY, includeStampBadge]);
+  }, [signPreviewPageSize, activeSignaturePreview, signScale, signPosition, signCustomX, signCustomY]);
 
   const handleSelectSignPosition = (nextPosition: SignPositionPreset) => {
     setSignPosition(nextPosition);
@@ -840,7 +832,6 @@ export function PdfToolsRunner({tool}: Props) {
       imgSize.imgHeightPt,
       pageW,
       pageH,
-      includeStampBadge,
     );
     setSignCustomX(Math.round(resolved.x));
     setSignCustomY(Math.round(resolved.y));
@@ -888,7 +879,6 @@ export function PdfToolsRunner({tool}: Props) {
       activePreviewGeometry.imgSize.imgHeightPt,
       signPreviewPageSize.width,
       signPreviewPageSize.height,
-      includeStampBadge,
     );
     setSignPosition('custom');
     setSignCustomX(nextPt.x);
@@ -1181,51 +1171,14 @@ export function PdfToolsRunner({tool}: Props) {
           imgDims.height,
           pageWidth,
           pageHeight,
-          includeStampBadge,
         );
 
-        if (includeStampBadge) {
-          targetPage.drawRectangle({
-            x: x - 10,
-            y: y - 12,
-            width: imgDims.width + 20,
-            height: imgDims.height + 40,
-            color: rgb(0.97, 0.98, 1),
-            borderColor: rgb(0.04, 0.55, 1),
-            borderWidth: 1,
-          });
-          targetPage.drawImage(embeddedImg, {
-            x,
-            y: y + 15,
-            width: imgDims.width,
-            height: imgDims.height,
-          });
-          const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-          const regFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-          const nameText = signerName.trim() || 'Verified Signer';
-          const dateText = signDate.trim() || new Date().toISOString().split('T')[0];
-          targetPage.drawText(`Signed by: ${nameText}`, {
-            x,
-            y: y + 3,
-            size: 8,
-            font,
-            color: rgb(0.06, 0.09, 0.16),
-          });
-          targetPage.drawText(`Date: ${dateText}`, {
-            x,
-            y: y - 7,
-            size: 7,
-            font: regFont,
-            color: rgb(0.3, 0.35, 0.45),
-          });
-        } else {
-          targetPage.drawImage(embeddedImg, {
-            x,
-            y,
-            width: imgDims.width,
-            height: imgDims.height,
-          });
-        }
+        targetPage.drawImage(embeddedImg, {
+          x,
+          y,
+          width: imgDims.width,
+          height: imgDims.height,
+        });
 
         const savedBytes = await pdfDoc.save();
         const blob = new Blob([savedBytes as unknown as BlobPart], {type: 'application/pdf'});
@@ -2561,15 +2514,12 @@ export function PdfToolsRunner({tool}: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                      Full Signer Name
+                      Signature Name / Text
                     </label>
                     <input
                       type="text"
                       value={signTypedText}
-                      onChange={(e) => {
-                        setSignTypedText(e.target.value);
-                        setSignerName(e.target.value);
-                      }}
+                      onChange={(e) => setSignTypedText(e.target.value)}
                       className="w-full rounded-xl border border-slate-300 dark:border-slate-700 p-2.5 text-xs bg-white dark:bg-slate-900"
                     />
                   </div>
@@ -2783,11 +2733,7 @@ export function PdfToolsRunner({tool}: Props) {
                               isDraggingSig
                                 ? 'ring-2 ring-[#0A8CFF] shadow-xl z-20'
                                 : 'hover:ring-2 hover:ring-[#0A8CFF]/80 z-10'
-                            } ${
-                              includeStampBadge
-                                ? 'bg-[#F7FAFF]/95 border border-[#0A8CFF]'
-                                : 'border border-dashed border-[#0A8CFF]/75 bg-white/25'
-                            }`}
+                            } border border-dashed border-[#0A8CFF]/75`}
                           >
                             {isDraggingSig && (
                               <div className="pointer-events-none absolute -top-6 left-0 whitespace-nowrap rounded bg-slate-900/90 px-1.5 py-0.5 text-[10px] font-mono text-white shadow">
@@ -2795,44 +2741,12 @@ export function PdfToolsRunner({tool}: Props) {
                               </div>
                             )}
 
-                            {includeStampBadge ? (
-                              <div className="relative h-full w-full overflow-hidden">
-                                <img
-                                  src={activeSignaturePreview.dataUrl}
-                                  alt="Draggable signature preview"
-                                  draggable={false}
-                                  style={{
-                                    left: `${(activePreviewGeometry.box.leftPadPt / activePreviewGeometry.box.outerWidthPt) * 100}%`,
-                                    top: `${(13 / activePreviewGeometry.box.outerHeightPt) * 100}%`,
-                                    width: `${(activePreviewGeometry.box.imgWidthPt / activePreviewGeometry.box.outerWidthPt) * 100}%`,
-                                    height: `${(activePreviewGeometry.box.imgHeightPt / activePreviewGeometry.box.outerHeightPt) * 100}%`,
-                                  }}
-                                  className="absolute object-contain pointer-events-none select-none"
-                                />
-                                <div
-                                  style={{
-                                    left: `${(activePreviewGeometry.box.leftPadPt / activePreviewGeometry.box.outerWidthPt) * 100}%`,
-                                    right: `${(activePreviewGeometry.box.rightPadPt / activePreviewGeometry.box.outerWidthPt) * 100}%`,
-                                    bottom: `${(2 / activePreviewGeometry.box.outerHeightPt) * 100}%`,
-                                  }}
-                                  className="absolute pointer-events-none leading-tight overflow-hidden"
-                                >
-                                  <div className="truncate text-[9px] sm:text-[10px] font-bold text-slate-900">
-                                    Signed by: {signerName.trim() || 'Verified Signer'}
-                                  </div>
-                                  <div className="truncate text-[8px] sm:text-[9px] text-slate-600">
-                                    Date: {signDate.trim() || new Date().toISOString().split('T')[0]}
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <img
-                                src={activeSignaturePreview.dataUrl}
-                                alt="Draggable signature preview"
-                                draggable={false}
-                                className="h-full w-full object-contain pointer-events-none select-none"
-                              />
-                            )}
+                            <img
+                              src={activeSignaturePreview.dataUrl}
+                              alt="Draggable signature preview"
+                              draggable={false}
+                              className="h-full w-full object-contain pointer-events-none select-none"
+                            />
                           </div>
                         )}
                     </div>
@@ -2871,7 +2785,7 @@ export function PdfToolsRunner({tool}: Props) {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Target Page {pdfPageCount ? `(1 – ${pdfPageCount})` : ''}
@@ -2901,19 +2815,6 @@ export function PdfToolsRunner({tool}: Props) {
                     <option value="top-right">Top Right Corner</option>
                     <option value="custom">Custom Coordinates</option>
                   </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Signing Date
-                  </label>
-                  <input
-                    type="text"
-                    value={signDate}
-                    onChange={(e) => setSignDate(e.target.value)}
-                    placeholder="YYYY-MM-DD"
-                    className="w-full rounded-xl border border-slate-300 dark:border-slate-700 p-2.5 text-xs bg-white dark:bg-slate-900"
-                  />
                 </div>
               </div>
 
@@ -2964,31 +2865,6 @@ export function PdfToolsRunner({tool}: Props) {
                     className="w-full mt-2"
                   />
                 </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                <div className="w-full sm:w-auto">
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Signer Name on Badge
-                  </label>
-                  <input
-                    type="text"
-                    value={signerName}
-                    onChange={(e) => setSignerName(e.target.value)}
-                    placeholder="e.g. Jane Doe"
-                    className="w-full sm:w-56 rounded-xl border border-slate-300 dark:border-slate-700 p-2 text-xs bg-white dark:bg-slate-900"
-                  />
-                </div>
-
-                <label className="inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 cursor-pointer sm:pt-4">
-                  <input
-                    type="checkbox"
-                    checked={includeStampBadge}
-                    onChange={(e) => setIncludeStampBadge(e.target.checked)}
-                    className="rounded border-slate-300 text-[#0A8CFF]"
-                  />
-                  <span>Include visual verification stamp border &amp; signer details</span>
-                </label>
               </div>
             </div>
           </div>

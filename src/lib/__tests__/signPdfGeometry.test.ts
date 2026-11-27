@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 import {
   applyPointerDeltaToPositionPt,
   clampSignaturePositionPt,
@@ -39,36 +39,31 @@ describe('Sign PDF Geometry, Drag Mapping, and PDF Output Round-Trip', () => {
     const imgW = 140;
     const imgH = 52.5;
 
-    const br = resolveSignaturePositionPt('bottom-right', 0, 0, imgW, imgH, pageW, pageH, true);
+    const br = resolveSignaturePositionPt('bottom-right', 0, 0, imgW, imgH, pageW, pageH);
     expect(br.x).toBeCloseTo(612 - 140 - 40, 5);
     expect(br.y).toBeCloseTo(40, 5);
 
-    const bl = resolveSignaturePositionPt('bottom-left', 0, 0, imgW, imgH, pageW, pageH, true);
+    const bl = resolveSignaturePositionPt('bottom-left', 0, 0, imgW, imgH, pageW, pageH);
     expect(bl.x).toBeCloseTo(40, 5);
     expect(bl.y).toBeCloseTo(40, 5);
 
-    const bc = resolveSignaturePositionPt('bottom-center', 0, 0, imgW, imgH, pageW, pageH, true);
+    const bc = resolveSignaturePositionPt('bottom-center', 0, 0, imgW, imgH, pageW, pageH);
     expect(bc.x).toBeCloseTo((612 - 140) / 2, 5);
     expect(bc.y).toBeCloseTo(40, 5);
 
-    const tr = resolveSignaturePositionPt('top-right', 0, 0, imgW, imgH, pageW, pageH, true);
+    const tr = resolveSignaturePositionPt('top-right', 0, 0, imgW, imgH, pageW, pageH);
     expect(tr.x).toBeCloseTo(612 - 140 - 40, 5);
     expect(tr.y).toBeCloseTo(792 - 52.5 - 40, 5);
 
-    // Custom (0, 0) with badge clamps cleanly to minimum badge margin (x=10, y=12), NOT 40
-    const zeroWithBadge = resolveSignaturePositionPt('custom', 0, 0, imgW, imgH, pageW, pageH, true);
-    expect(zeroWithBadge.x).toBe(10);
-    expect(zeroWithBadge.y).toBe(12);
-
-    // Custom (0, 0) without badge stays exact (0, 0)
-    const zeroNoBadge = resolveSignaturePositionPt('custom', 0, 0, imgW, imgH, pageW, pageH, false);
-    expect(zeroNoBadge.x).toBe(0);
-    expect(zeroNoBadge.y).toBe(0);
+    // Custom (0, 0) stays exact (0, 0) with zero padding
+    const zeroPos = resolveSignaturePositionPt('custom', 0, 0, imgW, imgH, pageW, pageH);
+    expect(zeroPos.x).toBe(0);
+    expect(zeroPos.y).toBe(0);
 
     // Out-of-bounds positive custom coordinates clamp within page
-    const clampedHigh = clampSignaturePositionPt(999, 999, imgW, imgH, pageW, pageH, true);
-    expect(clampedHigh.x).toBeCloseTo(pageW - imgW - 10, 5);
-    expect(clampedHigh.y).toBeCloseTo(pageH - imgH - 28, 5);
+    const clampedHigh = clampSignaturePositionPt(999, 999, imgW, imgH, pageW, pageH);
+    expect(clampedHigh.x).toBeCloseTo(pageW - imgW, 5);
+    expect(clampedHigh.y).toBeCloseTo(pageH - imgH, 5);
   });
 
   it('maps DOM preview drag deltas accurately to PDF bottom-left coordinates and back to overlay percentages', () => {
@@ -90,24 +85,23 @@ describe('Sign PDF Geometry, Drag Mapping, and PDF Output Round-Trip', () => {
       imgH,
       pageW,
       pageH,
-      true,
     );
     expect(moved.x).toBe(200);
     expect(moved.y).toBe(300);
 
-    const box = computeSignatureBoxRectPt(moved.x, moved.y, imgW, imgH, true);
-    expect(box.outerLeftPt).toBe(190);
-    expect(box.outerBottomPt).toBe(288);
-    expect(box.outerWidthPt).toBe(160);
-    expect(box.outerHeightPt).toBe(90);
+    const box = computeSignatureBoxRectPt(moved.x, moved.y, imgW, imgH);
+    expect(box.outerLeftPt).toBe(200);
+    expect(box.outerBottomPt).toBe(300);
+    expect(box.outerWidthPt).toBe(140);
+    expect(box.outerHeightPt).toBe(50);
 
     const pct = signatureBoxToOverlayPct(box, pageW, pageH);
-    // left = 190 / 600 = 31.6667%
-    expect(pct.leftPct).toBeCloseTo((190 / 600) * 100, 4);
-    // top from DOM top = 800 - (288 + 90) = 422 => 422 / 800 = 52.75%
-    expect(pct.topPct).toBeCloseTo((422 / 800) * 100, 4);
-    expect(pct.widthPct).toBeCloseTo((160 / 600) * 100, 4);
-    expect(pct.heightPct).toBeCloseTo((90 / 800) * 100, 4);
+    // left = 200 / 600 = 33.3333%
+    expect(pct.leftPct).toBeCloseTo((200 / 600) * 100, 4);
+    // top from DOM top = 800 - (300 + 50) = 450 => 450 / 800 = 56.25%
+    expect(pct.topPct).toBeCloseTo((450 / 800) * 100, 4);
+    expect(pct.widthPct).toBeCloseTo((140 / 600) * 100, 4);
+    expect(pct.heightPct).toBeCloseTo((50 / 800) * 100, 4);
   });
 
   it('embeds signature onto only the selected target page at dragged coordinates in real pdf-lib output', async () => {
@@ -131,7 +125,7 @@ describe('Sign PDF Geometry, Drag Mapping, and PDF Output Round-Trip', () => {
     const imgDims = embeddedImg.scale(effectiveScale);
 
     // Simulate drag from bottom-right (-120px left, -180px up on a 306x396px preview)
-    const startPt = resolveSignaturePositionPt('bottom-right', 40, 40, imgDims.width, imgDims.height, pageW, pageH, true);
+    const startPt = resolveSignaturePositionPt('bottom-right', 40, 40, imgDims.width, imgDims.height, pageW, pageH);
     const draggedPt = applyPointerDeltaToPositionPt(
       startPt.x,
       startPt.y,
@@ -143,40 +137,13 @@ describe('Sign PDF Geometry, Drag Mapping, and PDF Output Round-Trip', () => {
       imgDims.height,
       pageW,
       pageH,
-      true,
     );
 
-    const font = await signDoc.embedFont(StandardFonts.HelveticaBold);
-    const regFont = await signDoc.embedFont(StandardFonts.Helvetica);
-
-    targetPage.drawRectangle({
-      x: draggedPt.x - 10,
-      y: draggedPt.y - 12,
-      width: imgDims.width + 20,
-      height: imgDims.height + 40,
-      color: rgb(0.97, 0.98, 1),
-      borderColor: rgb(0.04, 0.55, 1),
-      borderWidth: 1,
-    });
     targetPage.drawImage(embeddedImg, {
       x: draggedPt.x,
-      y: draggedPt.y + 15,
+      y: draggedPt.y,
       width: imgDims.width,
       height: imgDims.height,
-    });
-    targetPage.drawText('Signed by: Alice Tester', {
-      x: draggedPt.x,
-      y: draggedPt.y + 3,
-      size: 8,
-      font,
-      color: rgb(0.06, 0.09, 0.16),
-    });
-    targetPage.drawText('Date: 2026-11-26', {
-      x: draggedPt.x,
-      y: draggedPt.y - 7,
-      size: 7,
-      font: regFont,
-      color: rgb(0.3, 0.35, 0.45),
     });
 
     const signedBytes = await signDoc.save();
@@ -199,15 +166,10 @@ describe('Sign PDF Geometry, Drag Mapping, and PDF Output Round-Trip', () => {
       .map((i: any) => i.str)
       .join(' ');
 
-    expect(page1Text).not.toContain('Signed by: Alice Tester');
-    expect(page3Text).not.toContain('Signed by: Alice Tester');
-    expect(page2Text).toContain('Signed by: Alice Tester');
-    expect(page2Text).toContain('Date: 2026-11-26');
-
-    const signedByItem = page2TextItems.find((i) => i.str.includes('Signed by: Alice Tester'));
-    expect(signedByItem).toBeDefined();
-    // PDF text transform [4]=x, [5]=y
-    expect(signedByItem!.transform[4]).toBeCloseTo(draggedPt.x, 1);
-    expect(signedByItem!.transform[5]).toBeCloseTo(draggedPt.y + 3, 1);
+    expect(page1Text).not.toContain('Signed by');
+    expect(page2Text).not.toContain('Signed by');
+    expect(page3Text).not.toContain('Signed by');
+    expect(page2Text).not.toContain('Date:');
+    expect(page2Text).toContain('Page 2 Content');
   });
 });

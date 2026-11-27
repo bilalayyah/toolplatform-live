@@ -1322,7 +1322,7 @@ export const TOOLS: readonly Tool[] = [
     url: '/sign-pdf',
     description: 'Add a visible electronic signature stamp to PDF pages via 100% in-browser qpdf-wasm—not a certified PKCS#7 signature.',
     longDescription:
-      'Sign PDF lets you apply a clean visual electronic signature stamp to any PDF page using 100% in-browser qpdf-wasm processing. Draw your signature, type with custom signature typography, or upload a signature image. Position the stamp precisely, pick target pages, and optionally display your printed signer name and date. Honest limits notice: This tool applies a visible electronic signature stamp—it does NOT create a certified PKCS#7 digital signature, cryptographic certificate authority (CA) certificate, or timestamp token.',
+      'Sign PDF lets you apply a clean visual electronic signature stamp to any PDF page using 100% in-browser qpdf-wasm processing. Draw your signature, type with custom signature typography, or upload a signature image. Position the stamp precisely and pick target pages. Honest limits notice: This tool applies a visible electronic signature stamp—it does NOT create a certified PKCS#7 digital signature, cryptographic certificate authority (CA) certificate, or timestamp token.',
     keywords: [
       'sign pdf',
       'electronic signature',
@@ -1372,11 +1372,6 @@ export const TOOLS: readonly Tool[] = [
         question: 'Can I choose which page the signature appears on?',
         answer:
           'Yes. You can place your signature on Page 1, any specific internal page, or the final page of your document.',
-      },
-      {
-        question: 'Can I include signer name, date, and verification frame?',
-        answer:
-          'Yes. You can toggle a neat verification badge displaying your printed signer name, date, and an honest visual stamp notice.',
       },
     ],
     relatedTools: ['protect-pdf', 'merge-pdf', 'word-to-pdf', 'rotate-pdf'],
