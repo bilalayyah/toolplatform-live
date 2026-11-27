@@ -1,6 +1,7 @@
 import React, {useState, useMemo} from 'react';
-import {Copy, Check, DollarSign, Percent, Calculator, TrendingUp, Landmark, ShieldAlert, ArrowRightLeft, Sparkles} from 'lucide-react';
+import {Copy, Check, DollarSign, Percent, Calculator, TrendingUp, Landmark, ShieldAlert, ArrowRightLeft, Sparkles, Clock} from 'lucide-react';
 import type {Tool} from '../../data/tools';
+import {OnlineHourlyCalculator} from './OnlineHourlyCalculator';
 
 interface Props {
   tool: Tool;
@@ -21,7 +22,7 @@ export function FinanceToolsRunner({tool}: Props) {
       <div className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/80 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A8CFF]/10 text-[#0A8CFF]">
-            <Calculator className="h-5 w-5" />
+            {tool.slug === 'online-hourly-calculator' ? <Clock className="h-5 w-5" /> : <Calculator className="h-5 w-5" />}
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-950 dark:text-white">
@@ -39,6 +40,7 @@ export function FinanceToolsRunner({tool}: Props) {
       </div>
 
       <div className="p-6 sm:p-8 space-y-6">
+        {tool.slug === 'online-hourly-calculator' && <OnlineHourlyCalculator />}
         {tool.slug === 'finance-emi-calculator' && <EmiCalculator onCopy={copyText} copiedKey={copiedKey} />}
         {tool.slug === 'finance-gst-calculator' && <GstCalculator onCopy={copyText} copiedKey={copiedKey} />}
         {tool.slug === 'finance-income-tax-calculator' && <IncomeTaxCalculator onCopy={copyText} copiedKey={copiedKey} />}

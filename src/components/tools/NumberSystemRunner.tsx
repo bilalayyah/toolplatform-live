@@ -1,6 +1,7 @@
 import React, {useState, useMemo} from 'react';
-import {Copy, Check, ArrowRightLeft, Cpu, Binary, AlertCircle, Sparkles, RefreshCw} from 'lucide-react';
+import {Copy, Check, ArrowRightLeft, Cpu, Binary, AlertCircle, Sparkles, RefreshCw, Hash} from 'lucide-react';
 import type {Tool} from '../../data/tools';
+import {RomanNumeralConverter} from './RomanNumeralConverter';
 
 interface Props {
   tool: Tool;
@@ -8,6 +9,7 @@ interface Props {
 
 export function NumberSystemRunner({tool}: Props) {
   const isBcd = tool.slug === 'number-bcd-converter';
+  const isRoman = tool.slug === 'roman-numeral-converter';
 
   return (
     <div className="mx-auto mt-6 max-w-4xl rounded-[18px] border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
@@ -15,7 +17,7 @@ export function NumberSystemRunner({tool}: Props) {
       <div className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/80 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0A8CFF]/10 text-[#0A8CFF]">
-            {isBcd ? <Binary className="h-5 w-5" /> : <Cpu className="h-5 w-5" />}
+            {isRoman ? <Hash className="h-5 w-5" /> : isBcd ? <Binary className="h-5 w-5" /> : <Cpu className="h-5 w-5" />}
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-950 dark:text-white">
@@ -33,7 +35,7 @@ export function NumberSystemRunner({tool}: Props) {
       </div>
 
       <div className="p-6 sm:p-8">
-        {isBcd ? <BcdConverter /> : <BinaryGrayConverter />}
+        {isRoman ? <RomanNumeralConverter /> : isBcd ? <BcdConverter /> : <BinaryGrayConverter />}
       </div>
     </div>
   );

@@ -547,18 +547,18 @@ export const CATEGORIES: readonly ToolCategory[] = [
     slug: 'finance-tools',
     url: '/finance-tools',
     description:
-      'Browser calculators for Indian GST/Income Tax/Salary, discounts, EMI, mutual fund SIP estimates, FD schedules, and scientific math.',
+      'Browser calculators for hourly pay/work hours, Indian GST/Income Tax/Salary, discounts, EMI, mutual fund SIP estimates, FD schedules, and scientific math.',
     intro:
-      'Finance Tools compiles 8 client-side financial and math calculators: India-specific GST, Income Tax (FY 2025–26 & 2026–27), and Salary CTC tools, plus universal Discount, EMI, FD (with yearly schedule), ESTIMATE-ONLY mutual fund SIP projections, and an Advanced Scientific Calculator with Basic/Scientific mode switch.',
+      'Finance Tools compiles 9 client-side financial and math calculators: Online Hourly Calculator (work hours, breaks, decimal hours & wage earnings), India-specific GST, Income Tax (FY 2025–26 & 2026–27), and Salary CTC tools, plus universal Discount, EMI, FD (with yearly schedule), ESTIMATE-ONLY mutual fund SIP projections, and an Advanced Scientific Calculator with Basic/Scientific mode switch.',
     icon: 'Landmark',
-    seoTitle: `Finance Tools — 8 Financial Calculators | ${SITE_CONFIG.siteName}`,
+    seoTitle: `Finance Tools — 9 Financial Calculators | ${SITE_CONFIG.siteName}`,
     seoDescription:
-      'Explore 8 upcoming Finance Tools: India-specific GST/Tax/Salary, Discount, EMI, estimate-only SIP, FD schedule, and Scientific Calculator.',
+      'Explore 9 Finance Tools: Online Hourly Calculator, India-specific GST/Tax/Salary, Discount, EMI, estimate-only SIP, FD schedule, and Scientific Calculator.',
     faqs: [
       {
         question: 'Which Finance Tools are India-specific?',
         answer:
-          'GST Calculator (Indian GST/CGST/SGST), Income Tax Calculator (Indian FY 2025–26 & 2026–27 slabs), and Salary Calculator (Indian CTC/PF/tax) are explicitly India-specific.',
+          'GST Calculator (Indian GST/CGST/SGST), Income Tax Calculator (Indian FY 2025–26 & 2026–27 slabs), and Salary Calculator (Indian CTC/PF/tax) are explicitly India-specific, while Online Hourly Calculator, EMI, Discount, SIP, FD, and Scientific Calculator apply universally.',
       },
       {
         question: 'Are SIP Calculator returns guaranteed?',
@@ -573,7 +573,7 @@ export const CATEGORIES: readonly ToolCategory[] = [
       {
         question: 'Is personal income data sent to any server?',
         answer:
-          'No. Every financial formula runs privately inside your browser.',
+          'No. Every financial and hourly wage formula runs privately inside your browser.',
       },
     ],
   },
@@ -584,23 +584,23 @@ export const CATEGORIES: readonly ToolCategory[] = [
     slug: 'number-system-converters',
     url: '/number-system-converters',
     description:
-      'Pure formula digital logic converters for Binary-Coded Decimal (BCD) and reflected Binary ↔ Gray code.',
+      'Pure formula digital logic and number system converters for Binary-Coded Decimal (BCD), reflected Binary ↔ Gray code, and Roman numerals.',
     intro:
-      'Number System Converters brings 2 pure-formula digital electronics utilities to your browser (NOT AI): BCD Converter (decimal ↔ 4-bit Binary-Coded Decimal per digit) and Binary to Gray Code Converter (two-way conversions with step-by-step XOR working).',
+      'Number System Converters brings 3 pure-formula digital and number conversion utilities to your browser (NOT AI): BCD Converter (decimal ↔ 4-bit Binary-Coded Decimal per digit), Binary to Gray Code Converter (two-way conversions with step-by-step XOR working), and Roman Numeral Converter (bidirectional integer 1–3999 conversion and Roman calendar dates).',
     icon: 'Binary',
-    seoTitle: `Number System Converters — BCD & Gray Code | ${SITE_CONFIG.siteName}`,
+    seoTitle: `Number System Converters — BCD, Gray & Roman | ${SITE_CONFIG.siteName}`,
     seoDescription:
-      'Explore 2 pure-formula Number System Converters: BCD Converter and Binary to Gray Code Converter with step-by-step working.',
+      'Explore 3 pure-formula Number System Converters: BCD Converter, Binary to Gray Code Converter, and Roman Numeral Converter with dates.',
     faqs: [
       {
         question: 'Are Number System Converters pure formula calculators?',
         answer:
-          'Yes. Both BCD and Binary ↔ Gray code tools apply deterministic digital logic rules in your browser without AI.',
+          'Yes. All BCD, Binary ↔ Gray code, and Roman numeral utilities apply deterministic conversion rules in your browser without AI.',
       },
       {
-        question: 'Do both tools support two-way conversions?',
+        question: 'Do the converters support two-way conversions?',
         answer:
-          'Yes. BCD converts decimal ↔ BCD in both directions, and Binary to Gray Code converts binary ↔ Gray code with step-by-step working.',
+          'Yes. BCD converts decimal ↔ BCD, Binary to Gray converts binary ↔ Gray code with step-by-step working, and Roman Numeral Converter converts integers ↔ Roman numerals and calendar dates in both directions.',
       },
       {
         question: 'Why does BCD use 4 bits per decimal digit?',
@@ -610,7 +610,7 @@ export const CATEGORIES: readonly ToolCategory[] = [
       {
         question: 'Are Number System Converters free without sign-in?',
         answer:
-          'Yes. Both utilities are free, browser-based, and watermark-free.',
+          'Yes. All three utilities are free, browser-based, and watermark-free.',
       },
     ],
   },

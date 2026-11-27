@@ -597,4 +597,294 @@ export const FINANCE_TOOLS: readonly Tool[] = [
     rating: null,
     status: 'active',
   },
+  {
+    id: 'online-hourly-calculator',
+    name: 'Online Hourly Calculator',
+    slug: 'online-hourly-calculator',
+    category: 'finance-tools',
+    url: '/online-hourly-calculator',
+    description:
+      'Calculate work hours between times, subtract lunch/breaks, add time durations, convert decimal hours, and compute earnings.',
+    longDescription:
+      'Comprehensive hourly wage and time duration calculator: compute hours between start and end times, deduct breaks and unpaid time, add or subtract time intervals, convert decimal hours to hours/minutes, and calculate gross earnings with overtime multipliers in your browser. Time management, payroll estimation, and shift planning require absolute accuracy when tracking working hours, lunch intervals, overtime premiums, and decimal equivalents. This professional-grade online hourly calculator is engineered specifically to streamline these calculations across five versatile workspace modes: Mode 1 (Time Between Times) computes exact elapsed hours and minutes between any start and end timestamps, with built-in overnight shift support for shifts crossing midnight such as 22:00 to 06:00; Mode 2 (Work Hours Calculator with Breaks) manages complex shift schedules by deducting multiple custom unpaid break periods and extra unpaid minutes while performing real-time overlap and boundary validation; Mode 3 (Time Arithmetic) performs precise addition and subtraction of time intervals (hours and minutes) with automatic carries for minutes exceeding 60; Mode 4 (Decimal Hours Converter) transforms fractional decimal hours into clean hours and minutes (or vice versa) with adjustable precision ranging from zero to four decimal places; and Mode 5 (Pay & Overtime Calculator) computes gross earnings by multiplying regular hours by an hourly pay rate while applying customized overtime multipliers (such as 1.5x or 2.0x) for hours worked beyond standard thresholds. Additional features include support for eight major world currencies (USD, EUR, GBP, AED, PKR, INR, CAD, AUD), instant printing and clipboard copying, session history tracking up to eight recent calculations, and responsive mobile optimization. All calculations execute deterministically on your local device via client-side JavaScript with zero server uploads, cookies tracking, or external AI dependencies.',
+    keywords: [
+      'hourly calculator',
+      'work hours calculator',
+      'time duration calculator',
+      'pay calculator',
+      'decimal hours converter',
+    ],
+    icon: 'Clock',
+    acceptedFormats: ['Time / Numeric'],
+    maxFileSizeMB: null,
+    maxFiles: null,
+    processingMethod: 'browser',
+    seoTitle: `Online Hourly Calculator & Work Hours Tracker | ${SITE_CONFIG.siteName}`,
+    seoDescription:
+      'Calculate hours worked between times, deduct breaks, convert decimal hours, and compute hourly wages with overtime.',
+    howTo: [
+      {
+        title: 'Select calculation mode',
+        description:
+          'Choose from Time Between Times, Total Work Hours with Breaks, Time Arithmetic, Decimal Converter, or Pay & Overtime Calculator in the interactive workspace tabs.',
+      },
+      {
+        title: 'Enter start, end, or break times',
+        description:
+          'Input clock timestamps, shift durations, unpaid lunch intervals, hourly wage rates, or decimal hour values.',
+      },
+      {
+        title: 'Copy total hours or pay',
+        description:
+          'View exact hours, minutes, decimal breakdowns, regular earnings, and overtime pay instantly with zero uploads or AI.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'How does Online Hourly Calculator handle overnight shifts?',
+        answer:
+          'You can toggle the overnight shift checkbox so shifts crossing midnight (such as 22:00 to 06:00 or 10:30 PM to 06:30 AM) calculate elapsed time accurately without manual subtraction.',
+      },
+      {
+        question: 'Can I deduct multiple unpaid breaks or lunch periods?',
+        answer:
+          'Yes. Mode 2 allows adding multiple custom break periods with individual start and end times plus extra unpaid minutes, automatically subtracting them from total elapsed shift time.',
+      },
+      {
+        question: 'How do decimal hours convert to hours and minutes?',
+        answer:
+          'Decimal hours (such as 7.5 hours or 2.75 hours) convert precisely into standard hours and minutes (7 hours 30 minutes and 2 hours 45 minutes), and vice versa.',
+      },
+      {
+        question: 'Does this calculator use AI or external servers?',
+        answer:
+          'No. All time duration, wage, and decimal conversion calculations run deterministically inside your web browser with zero remote server requests or AI involvement.',
+      },
+      {
+        question: 'How are overtime earnings calculated in Mode 5?',
+        answer:
+          'Overtime earnings multiply designated overtime hours by your base hourly rate and your selected overtime multiplier (commonly 1.5x for time-and-a-half or 2.0x for double time).',
+      },
+      {
+        question: 'What currencies are supported in the pay calculator?',
+        answer:
+          'The wage calculator supports eight major currencies including US Dollar (USD), Euro (EUR), British Pound (GBP), UAE Dirham (AED), Pakistani Rupee (PKR), Indian Rupee (INR), Canadian Dollar (CAD), and Australian Dollar (AUD).',
+      },
+      {
+        question: 'Can I print or export my shift calculation summary?',
+        answer:
+          'Yes. A dedicated print button formats your active shift calculation results into a clean, printer-friendly summary sheet for payroll records or timesheet filing.',
+      },
+      {
+        question: 'How does time arithmetic handle minutes exceeding 60?',
+        answer:
+          'When adding time intervals in Mode 3 where minutes sum to 60 or more, the calculator automatically carries over the excess into additional hours.',
+      },
+      {
+        question: 'Is there a limit on session history records?',
+        answer:
+          'The interactive workspace automatically records up to your last eight calculations in a quick-reference session history list for effortless comparison.',
+      },
+      {
+        question: 'What validation checks prevent overlapping breaks?',
+        answer:
+          'The break validator inspects all entered break intervals in Mode 2 and flags any overlapping time ranges or breaks that exceed total shift duration.',
+      },
+      {
+        question: 'Can I switch between 12-hour and 24-hour time formats?',
+        answer:
+          'Yes. You can toggle between 12-hour AM/PM and 24-hour military time formats across all timestamp inputs for maximum user preference.',
+      },
+      {
+        question: 'Does the tool account for unpaid extra minutes?',
+        answer:
+          'Yes. Mode 2 includes an optional extra unpaid minutes input for rounding or unmapped administrative pauses.',
+      },
+      {
+        question: 'How precise are decimal hour conversions?',
+        answer:
+          'Decimal hour conversions support adjustable rounding precision from zero up to four decimal places depending on payroll reporting requirements.',
+      },
+      {
+        question: 'Are there any hidden subscription fees or premium paywalls?',
+        answer:
+          'None. All five calculator modes and features are entirely free with zero watermarks or login requirements.',
+      },
+      {
+        question: 'Can remote freelancers use this for client billing?',
+        answer:
+          'Yes. Freelancers and consultants use the time duration and hourly pay calculator to tabulate billable hours and invoice totals accurately.',
+      },
+      {
+        question: 'Does the calculator work on mobile phones and tablets?',
+        answer:
+          'Yes. The interface is fully responsive, tested extensively on 375px mobile viewports, and guarantees zero horizontal scrolling or layout clipping.',
+      },
+      {
+        question: 'How are average hourly rates computed when overtime is included?',
+        answer:
+          'Average hourly rate is calculated by dividing total gross earnings (regular plus overtime pay) by total working hours.',
+      },
+      {
+        question: 'Is my wage and shift data stored permanently?',
+        answer:
+          'All calculations reside temporarily in browser session state and are never transmitted to external databases or cloud servers.',
+      },
+      {
+        question: 'Can I copy final pay figures with a single click?',
+        answer:
+          'Yes. Dedicated copy buttons copy calculated earnings, decimal hours, and duration strings instantly to your clipboard.',
+      },
+      {
+        question: 'What error handling is provided for invalid time inputs?',
+        answer:
+          'Invalid time formats, end times preceding start times, or excessive break lengths generate clear inline warning alerts instantly.',
+      },
+      {
+        question: 'Does this tool replace official employer payroll systems?',
+        answer:
+          'This calculator provides reliable time and wage estimates for personal tracking and freelancing, but official payroll filings should adhere to company tax withholding guidelines.',
+      },
+      {
+        question: 'Are there keyboard shortcuts for rapid calculations?',
+        answer:
+          'All input fields support standard numeric typing, Tab navigation, and Enter key evaluation for efficient data entry.',
+      },
+      {
+        question: 'Can I calculate weekly or monthly earnings from daily hours?',
+        answer:
+          'Yes. You can multiply daily decimal work hours by the number of workdays per week or month to project recurring earnings.',
+      },
+      {
+        question: 'How are fractional minutes handled in time calculations?',
+        answer:
+          'All interval durations compute down to the exact minute level without rounding error drift.',
+      },
+      {
+        question: 'Does the calculator support split shifts?',
+        answer:
+          'Yes. You can calculate separate shift intervals using Mode 1 or Mode 3 and sum them together easily.',
+      },
+      {
+        question: 'Is it possible to calculate project billing estimates based on estimated hours?',
+        answer:
+          'Yes. Enter your agreed hourly rate in Mode 5 and your estimated project hours to project total milestone billing.',
+      },
+      {
+        question: 'Are there any ads or pop-ups on the calculator page?',
+        answer:
+          'No. ToolPlatform maintains a clean, distraction-free environment with zero ads or annoying pop-ups.',
+      },
+      {
+        question: 'Can I use this calculator on multiple devices simultaneously?',
+        answer:
+          'Yes. The app works across desktop browsers, laptops, tablets, and smartphones without account syncing limits.',
+      },
+      {
+        question: 'How do I report a feature suggestion or bug?',
+        answer:
+          'You can visit our Contact page to share feedback or suggest additional tools for future platform updates.',
+      },
+      {
+        question: 'Does the tool require JavaScript to be enabled?',
+        answer:
+          'Yes. Client-side formula calculations require JavaScript enabled in your browser settings.',
+      },
+      {
+        question: 'Can I use comma decimals in European number formats?',
+        answer:
+          'Input fields accept standard decimal dots for precise calculation across international regions.',
+      },
+      {
+        question: 'How are pay stub deductions like taxes handled?',
+        answer:
+          'The calculator computes gross earnings and allows estimating net take-home pay using our companion Salary Calculator or Income Tax Calculator.',
+      },
+      {
+        question: 'Is there a limit on the maximum wage rate you can enter?',
+        answer:
+          'Input fields accept wage rates up to six digits to accommodate standard and executive hourly rates.',
+      },
+      {
+        question: 'Does the tool function correctly in dark mode?',
+        answer:
+          'Yes. The entire user interface supports automatic dark mode and light mode matching your system preference.',
+      },
+      {
+        question: 'Can I calculate hourly earnings for part-time student jobs?',
+        answer:
+          'Yes. Part-time students use the tool to track weekly hours and verify campus or retail paycheck earnings.',
+      },
+      {
+        question: 'How are lunch breaks treated if paid versus unpaid?',
+        answer:
+          'Mode 2 specifically calculates unpaid breaks by subtracting them from total elapsed work time.',
+      },
+      {
+        question: 'Is browser local storage used to save user inputs?',
+        answer:
+          'Inputs remain in active component state during your browsing session for smooth recalculation.',
+      },
+      {
+        question: 'Can I calculate night shift differentials?',
+        answer:
+          'Yes. Shift differentials can be calculated by applying customized hourly rates in Mode 5 for night hours.',
+      },
+      {
+        question: 'Does the calculator support bi-weekly pay period calculations?',
+        answer:
+          'Yes. Summing two weeks of calculated daily or weekly work hours yields accurate bi-weekly pay totals.',
+      },
+      {
+        question: 'How are holiday pay rates factored into calculations?',
+        answer:
+          'Holiday premium rates are easily computed by entering the elevated hourly rate or custom overtime multiplier in Mode 5.',
+      },
+      {
+        question: 'Are time zones accounted for in time interval calculations?',
+        answer:
+          'Calculations measure pure elapsed duration between entered local clock times without timezone adjustments.',
+      },
+      {
+        question: 'Can I track billable hours for legal or consulting services?',
+        answer:
+          'Yes. Lawyers, consultants, and agencies use Mode 1 and Mode 5 to bill clients by exact fractional hours.',
+      },
+      {
+        question: 'Is there any restriction on browser types or operating systems?',
+        answer:
+          'The calculator runs on any modern web browser including Chrome, Safari, Firefox, and Edge across Windows, macOS, Linux, iOS, and Android.',
+      },
+      {
+        question: 'How do I reset input fields back to default values?',
+        answer:
+          'Clearing or typing new values into input boxes instantly resets and updates calculated outputs.',
+      },
+      {
+        question: 'Can I calculate hours worked across multiple consecutive days?',
+        answer:
+          'Yes. Multi-day duration totals are easily calculated by summing daily shifts using Mode 3 time arithmetic.',
+      },
+      {
+        question: 'Does the application load quickly on slow mobile connections?',
+        answer:
+          'Yes. Lightweight client-side bundling ensures instant page loads even on standard cellular connections.',
+      },
+      {
+        question: 'Are mathematical formulas transparent and verifiable?',
+        answer:
+          'All time subtraction, break deduction, and wage multiplication formulas follow strict standard arithmetic without hidden rounding.',
+      },
+    ],
+    relatedTools: [
+      'finance-salary-calculator',
+      'finance-gst-calculator',
+      'finance-income-tax-calculator',
+      'finance-discount-calculator',
+    ],
+    popular: false,
+    featured: false,
+    rating: null,
+    status: 'active',
+  },
 ];
