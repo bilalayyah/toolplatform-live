@@ -605,8 +605,25 @@ export const FINANCE_TOOLS: readonly Tool[] = [
     url: '/online-hourly-calculator',
     description:
       'Calculate work hours between times, subtract lunch/breaks, add time durations, convert decimal hours, and compute earnings.',
-    longDescription:
-      'Comprehensive hourly wage and time duration calculator: compute hours between start and end times, deduct breaks and unpaid time, add or subtract time intervals, convert decimal hours to hours/minutes, and calculate gross earnings with overtime multipliers in your browser. Time management, payroll estimation, and shift planning require absolute accuracy when tracking working hours, lunch intervals, overtime premiums, and decimal equivalents. This professional-grade online hourly calculator is engineered specifically to streamline these calculations across five versatile workspace modes: Mode 1 (Time Between Times) computes exact elapsed hours and minutes between any start and end timestamps, with built-in overnight shift support for shifts crossing midnight such as 22:00 to 06:00; Mode 2 (Work Hours Calculator with Breaks) manages complex shift schedules by deducting multiple custom unpaid break periods and extra unpaid minutes while performing real-time overlap and boundary validation; Mode 3 (Time Arithmetic) performs precise addition and subtraction of time intervals (hours and minutes) with automatic carries for minutes exceeding 60; Mode 4 (Decimal Hours Converter) transforms fractional decimal hours into clean hours and minutes (or vice versa) with adjustable precision ranging from zero to four decimal places; and Mode 5 (Pay & Overtime Calculator) computes gross earnings by multiplying regular hours by an hourly pay rate while applying customized overtime multipliers (such as 1.5x or 2.0x) for hours worked beyond standard thresholds. Additional features include support for eight major world currencies (USD, EUR, GBP, AED, PKR, INR, CAD, AUD), instant printing and clipboard copying, session history tracking up to eight recent calculations, and responsive mobile optimization. All calculations execute deterministically on your local device via client-side JavaScript with zero server uploads, cookies tracking, or external AI dependencies.',
+    longDescription: `Calculate hours worked between start and end times, deduct unpaid breaks, add or subtract time durations, convert decimal hours, and estimate gross pay with overtime multipliers right in your browser. Accurate timekeeping is essential for payroll estimation, shift planning, lunch deductions, and overtime tracking.
+
+### The Five Calculation Modes
+
+This online hourly calculator handles everyday scheduling and wage math across five dedicated workspace modes:
+
+- Mode 1 (Time Between Times): Finds exact elapsed hours and minutes between timestamps, including overnight shifts crossing midnight such as 22:00 to 06:00.
+- Mode 2 (Work Hours Calculator with Breaks): Subtracts multiple custom unpaid breaks and extra unpaid minutes while checking break overlaps and shift boundaries in real time.
+- Mode 3 (Time Arithmetic): Adds and subtracts time intervals in hours and minutes with automatic carries whenever minutes exceed 60.
+- Mode 4 (Decimal Hours Converter): Converts fractional decimal hours into hours and minutes (and back) with configurable precision from zero to four decimal places.
+- Mode 5 (Pay & Overtime Calculator): Multiplies regular hours by your hourly rate and applies custom overtime multipliers such as 1.5x or 2.0x above standard thresholds.
+
+### More Features
+
+Beyond core calculations, the workspace includes eight currency options (USD, EUR, GBP, AED, PKR, INR, CAD, AUD), instant result printing, one-click clipboard copying, session history for up to eight recent entries, and a responsive mobile layout.
+
+### Private by Design
+
+All calculations execute deterministically in client-side JavaScript on your device—never uploading timesheets, tracking cookies, or calling external AI services.`,
     keywords: [
       'hourly calculator',
       'work hours calculator',

@@ -160,8 +160,29 @@ export const NUMBER_SYSTEM_TOOLS: readonly Tool[] = [
     url: '/roman-numeral-converter',
     description:
       'Convert numbers to Roman numerals and Roman numerals back to integers (1 to 3999), plus Roman calendar dates.',
-    longDescription:
-      'Bidirectional Roman numeral converter supporting integers from 1 to 3999, historical subtraction rules, strict syntax validation, and date conversion to/from Roman numerals (DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD) running instantly in your browser. Roman numerals originated in ancient Rome and remained the standard writing system across Europe throughout the Middle Ages. Numbers are represented through combinations of letters from the Latin alphabet using seven core symbols: I for 1, V for 5, X for 10, L for 50, C for 100, D for 500, and M for 1000. Unlike modern Arabic numerals which rely on positional value notation and a zero placeholder, Roman numerals operate on an additive and subtractive principle where symbols placed after larger values are added, while symbols placed before larger values of ten times or five times magnitude are subtracted. For instance, IV represents 4 (5 minus 1), IX represents 9 (10 minus 1), XL represents 40 (50 minus 10), XC represents 90 (100 minus 10), CD represents 400 (500 minus 100), and CM represents 900 (1000 minus 100). The standard upper bound for traditional Roman numerals without vinculum overlines is 3999, which is written as MMMCMXCIX (3000 + 900 + 90 + 9). This comprehensive browser tool enforces strict historical syntax validation to reject invalid repetitions like IIII, VV, or CCCC, checks proper subtractive ordering, provides session history logging up to eight recent conversions, and supports full calendar date formatting into Roman numerals such as XXVII/XI/MMXXVI. Everything operates entirely client-side in your web browser with zero server uploads or AI involvement, ensuring absolute data privacy and instantaneous deterministic formula computation.',
+    longDescription: `Convert integers between 1 and 3999 into Roman numerals and decode Roman numerals back to numbers, with historical subtraction rules, strict syntax checking, and calendar date formatting (DD/MM/YYYY, MM/DD/YYYY, YYYY-MM-DD) running instantly in your browser. Originating in ancient Rome, Roman numerals served as Europe's standard number system across the Middle Ages.
+
+### How Roman Numerals Work
+
+Roman numerals represent values by combining seven core Latin letters rather than using positional place value or a zero placeholder:
+
+- I equals 1
+- V equals 5
+- X equals 10
+- L equals 50
+- C equals 100
+- D equals 500
+- M equals 1000
+
+Under additive and subtractive rules, symbols placed after a larger symbol add to the total, whereas a smaller symbol placed before a symbol of five or ten times its value subtracts from it.
+
+### Subtractive Pairs
+
+Traditional notation permits six specific subtractive pairs: IV equals 4 (5 minus 1), IX equals 9 (10 minus 1), XL equals 40 (50 minus 10), XC equals 90 (100 minus 10), CD equals 400 (500 minus 100), and CM equals 900 (1000 minus 100).
+
+### Limits and Validation
+
+Without vinculum overlines, standard Roman numerals top out at 3999, formatted as MMMCMXCIX (3000 + 900 + 90 + 9). Strict syntax validation rejects non-standard repetitions such as IIII, VV, or CCCC alongside invalid subtractive ordering, keeps session history for up to eight recent conversions, and formats calendar dates like XXVII/XI/MMXXVI entirely client-side with zero uploads or AI.`,
     keywords: [
       'roman numeral converter',
       'roman to arabic number',

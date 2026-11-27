@@ -27,6 +27,7 @@ import {
 } from '../data/tools';
 import {EN_STRINGS} from '../i18n/en';
 import {getCategoryStyle, getToolIcon} from '../lib/icons';
+import {parseLongDescription} from '../lib/longDescriptionBlocks';
 
 interface ToolPageProps {
   slug: string;
@@ -745,9 +746,38 @@ export function ToolPage({slug}: ToolPageProps) {
               <h2 className="font-display text-xl font-bold text-slate-950 dark:text-white">
                 About {tool.name}
               </h2>
-              <p className="mt-2.5 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
-                {tool.longDescription}
-              </p>
+              {parseLongDescription(tool.longDescription).map((block, idx) => {
+                if (block.type === 'heading') {
+                  return (
+                    <h3
+                      key={idx}
+                      className={`${idx === 0 ? 'mt-2.5' : 'mt-6'} font-display text-base font-bold text-slate-950 dark:text-white`}
+                    >
+                      {block.text}
+                    </h3>
+                  );
+                }
+                if (block.type === 'list') {
+                  return (
+                    <ul
+                      key={idx}
+                      className="mt-2.5 list-disc space-y-1.5 pl-5 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300"
+                    >
+                      {block.items.map((item, itemIdx) => (
+                        <li key={itemIdx}>{item}</li>
+                      ))}
+                    </ul>
+                  );
+                }
+                return (
+                  <p
+                    key={idx}
+                    className="mt-2.5 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300"
+                  >
+                    {block.text}
+                  </p>
+                );
+              })}
             </section>
 
             {/* 4 FAQs in an Accordion */}

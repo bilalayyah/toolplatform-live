@@ -685,8 +685,63 @@ export const GENERATOR_TOOLS: readonly Tool[] = [
     url: '/alphabets-to-word-generator',
     description:
       'Enter your letters and discover all the words you can make from them.',
-    longDescription:
-      'What Is an Alphabets to Word Generator? An alphabets to word generator is a deterministic browser utility that transforms a loose set of letters into real, valid English words backed by a bundled lexicon—never random gibberish and never guessed by AI. Whenever you have scrambled tiles, jumbled puzzle clues, or a collection of alphabet letters, our word generator from letters scans 274,137 verified English entries from the open Letterpress English Word List (atebits/Words, CC0 1.0 Universal Public Domain / sindresorhus word-list, MIT license) to reveal every legitimate word you can build. Unlike a random word generator that invents synthetic strings, every result produced by this alphabet to word generator is checked strictly against both the dictionary and your input letter counts. How to Generate Words from Letters: Making English words using given letters takes three straightforward steps inside your browser. First, type or paste up to 15 alphabet characters (A–Z, uppercase or lowercase, with optional spaces) into the workspace box—for example, LISTEN or APPLE—and pick one of six specialized search modes: Generate Words, Find Anagrams, Find Short Words, Find Long Words, Exact Letter Anagrams, or Word Pattern Finder. Second, refine your search using optional filters including minimum and maximum word length, starting or ending letters, letters to include or exclude, known positional patterns such as P_A___, sort order, and display cap (defaulting to 200 results and adjustable up to 1,000). Third, click Generate Words to view matching dictionary words alongside character counts, copy individual words or the entire list to your clipboard, or download the list directly as a plain TXT file. How an Anagram Generator Works: At the core of our letters to words generator and anagram solver is exact letter-frequency matching. Before evaluating any dictionary entry, the engine counts how many times each letter appears in your input. A candidate word passes only if every letter it requires exists in your supply at least as many times as the word demands. Consider the input APPLE: it contains one A, two Ps, one L, and one E. Therefore, valid words you can make with letters from APPLE include APPLE, PALE, PEAL, LEAP, APE, and LAP, whereas a word needing three Ps or two As is rejected automatically. In Find Anagrams and Exact Letter Anagrams modes, the anagram finder goes one step further and compares the complete letter-frequency signature so every supplied character is used exactly once with none omitted and none added—turning LISTEN into LISTEN, SILENT, ENLIST, TINSEL, and INLETS while keeping shorter subset words out of exact-anagram results. How to Find the Longest Words: When you want to maximize word length in puzzle boards or vocabulary challenges, switch to Find Long Words mode or sort results with Longest Words First. Our longest word finder prioritizes full-length matches and highlights every dictionary word tied for the maximum character count at the top of your results, followed cleanly by shorter alternatives underneath so you never miss high-scoring plays when a single full-length word is unavailable. How to Find Short Words: Short words are essential for tight puzzle grids, parallel plays, and early vocabulary building. Using Find Short Words mode—our dedicated short word finder—you can switch between 2-, 3-, 4-, and 5-letter presets or set custom minimum and maximum lengths to browse organized word groups by character count. Discovering 2-letter and 3-letter words like APE and LAP from longer racks opens tight board hooks, helps students recognize common roots and suffixes, and builds confidence with compact word patterns. Tips for Making More Words from Letters: To get stronger results when you unscramble letters or explore word combinations, start by pairing vowels with versatile consonants such as S, T, R, N, and L, and test common prefixes or endings in Word Pattern Finder using the Starts With, Ends With, and Known Positions pattern syntax (for instance, typing PLANET with Starts With P or pattern P_A___ surfaces PLANET immediately). Use Include and Exclude filters when a crossword or puzzle board locks specific slots or eliminates unused letters, and experiment with repeated letters to uncover longer derivatives. Examples of Words from Letters: Verified directly against our bundled Letterpress English dictionary, common letter sets yield rich word families: LISTEN unscrambles into exact 6-letter anagrams LISTEN, SILENT, ENLIST, TINSEL, and INLETS alongside shorter words; APPLE builds APPLE, PALE, PEAL, LEAP, APE, and LAP while respecting the two-P cap; EARTH forms HEART and HATER alongside EARTH; STONE yields NOTES, ONSET, and TONES alongside STONE; CARE generates RACE and ACRE alongside CARE; and ANGLE produces ANGLE, ANGEL, GLEAN, GLEN, LEAN, LANE, AGE, and ALE. Who Can Use This Tool? This English word generator serves students practicing spelling and vocabulary recognition, teachers preparing classroom word-building exercises and printable TXT handouts, word game players looking up valid combinations or checking letter unscrambler possibilities, English learners exploring real word structures and letter-frequency constraints, writers brainstorming concise lexical alternatives, and puzzle enthusiasts solving anagrams and pattern clues locally without registration or server uploads. Honest Limits & Scope: Because this utility relies exclusively on the bundled 274,137-word Letterpress English Word List (lowercase A–Z words of 2 or more letters, excluding capitalized proper nouns, hyphenated phrases, and punctuated abbreviations), words missing from that lexicon do not appear, and different word games enforce their own distinct official dictionaries—so acceptance in every word game cannot be guaranteed. All processing stays strictly client-side in your browser, input accepts up to 15 letters, and displayed results default to a 200-word cap (adjustable up to 1,000 in Filters) to keep scrolling fast across desktop and mobile screens.',
+    longDescription: `An alphabets to word generator is a deterministic browser utility that converts loose sets of letters into genuine English words verified against a bundled lexicon—never random gibberish and never guessed by AI. Whenever you have scrambled tiles, jumbled puzzle clues, or spare alphabet letters, this word generator from letters searches 274,137 English entries from the open Letterpress English Word List (atebits/Words, CC0 1.0 Universal Public Domain / sindresorhus word-list, MIT license) so every match reflects both real spelling and your exact letter counts.
+
+### How to Generate Words from Letters
+
+Creating valid English words from your letters follows three quick steps directly inside your browser:
+
+- Enter up to 15 English letters (A–Z, uppercase or lowercase, with optional spaces)—such as LISTEN or APPLE—and select one of six modes: Generate Words, Find Anagrams, Find Short Words, Find Long Words, Exact Letter Anagrams, or Word Pattern Finder.
+- Optionally narrow results with minimum or maximum length, starting or ending letters, must-include or must-exclude letters, positional patterns like P_A___, sort order, and display cap (200 results by default, adjustable up to 1,000).
+- Click Generate Words to inspect matching entries with character counts, copy a single word or the full list to your clipboard, or download everything as a plain TXT file.
+
+### How the Anagram Solver Works
+
+At the heart of this letters to words generator and anagram solver is strict letter-frequency matching. The engine counts how often each letter appears in your input and rejects any dictionary candidate that demands more copies of a letter than you supplied. With APPLE (one A, two Ps, one L, one E), the solver accepts APPLE, PALE, PEAL, LEAP, APE, and LAP while automatically blocking words needing three Ps or two As. In Find Anagrams and Exact Letter Anagrams modes, every supplied letter must be used once with none left over—turning LISTEN into LISTEN, SILENT, ENLIST, TINSEL, and INLETS while keeping shorter subset words out of exact-anagram results.
+
+### Find the Longest Words
+
+When puzzle boards or vocabulary tasks call for maximum length, switch to Find Long Words or sort by Longest Words First. Find Long Words places every dictionary word tied for the highest available character count at the top of the list and displays shorter alternatives underneath.
+
+### Find the Short Words
+
+Compact words unlock tight grid hooks and help learners spot familiar roots and suffixes. In Find Short Words mode, toggle quick 2-, 3-, 4-, or 5-letter presets or set custom bounds to browse words like APE and LAP grouped clearly by length.
+
+### Tips for Making More Words
+
+Try these practical techniques to get fuller word sets when unscrambling letters:
+
+- Combine common vowels with flexible high-frequency consonants such as S, T, R, N, and L.
+- Test familiar prefixes and suffixes in Word Pattern Finder using Starts With, Ends With, and positional wildcards.
+- Filter locked board positions directly—for instance, entering PLANET with Starts With P or pattern P_A___ isolates PLANET cleanly.
+- Use Must Include and Must Exclude filters to match fixed grid letters or eliminate tiles already ruled out.
+- Experiment with repeated letters in your input to check longer inflected forms and derivatives.
+
+### Examples of Words from Letters
+
+Tested directly against the bundled 274,137-word Letterpress dictionary, familiar inputs form clear word families:
+
+- LISTEN produces exact 6-letter anagrams LISTEN, SILENT, ENLIST, TINSEL, and INLETS alongside shorter subset words.
+- APPLE generates APPLE, PALE, PEAL, LEAP, APE, and LAP while strictly enforcing the two-P cap.
+- EARTH forms exact anagrams HEART and HATER alongside EARTH.
+- STONE yields NOTES, ONSET, and TONES alongside STONE.
+- CARE generates RACE and ACRE alongside CARE.
+- ANGLE produces ANGLE, ANGEL, GLEAN, GLEN, LEAN, LANE, AGE, and ALE.
+
+### Who Can Use This Tool
+
+Everything runs locally in your browser without registration or server uploads for:
+
+- Students practicing spelling patterns and vocabulary recognition.
+- Teachers assembling classroom word-building exercises and printable TXT sheets.
+- Word game players checking valid tile combinations and letter-unscrambler possibilities.
+- English learners exploring real spelling structures and letter-frequency constraints.
+- Writers brainstorming concise lexical choices for titles or copy.
+- Puzzle enthusiasts solving newspaper anagrams and pattern clues offline-ready.
+
+### Honest Limits
+
+Results draw exclusively from the bundled 274,137-word Letterpress English Word List (lowercase A–Z words of two or more letters, excluding capitalized proper nouns, hyphenated compounds, and punctuated abbreviations). Words absent from that list cannot appear, and because different board and word games maintain separate official word lists, acceptance in every game cannot be guaranteed. Processing stays strictly client-side, inputs accept up to 15 letters, and displayed output defaults to 200 words (adjustable up to 1,000 in Filters) to keep scrolling responsive on desktop and mobile devices.`,
     keywords: [
       'alphabets to word generator',
       'alphabet to word generator',
