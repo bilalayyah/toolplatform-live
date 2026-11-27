@@ -399,18 +399,18 @@ export const CATEGORIES: readonly ToolCategory[] = [
     slug: 'science-tools',
     url: '/science-tools',
     description:
-      'Browser-based chemistry solution calculators, multi-formula physics solvers, and DNA/RNA sequence converters.',
+      'Browser-based chemistry solution calculators, multi-formula physics solvers, DNA/RNA sequence converters, and a heat index calculator.',
     intro:
-      'Science Tools brings 3 deterministic STEM calculators directly to your browser: Chemistry Solutions Calculator (molarity, molality, normality, mole fraction, M1V1 = M2V2 dilution, pH/[H+]/pOH), Physics Calculator (solving whichever variable is left empty across mechanics, waves, and Ohm’s Law), and DNA/RNA Converter (T↔U, complement, and reverse complement).',
+      'Science Tools brings 4 deterministic STEM utilities directly to your browser: Chemistry Solutions Calculator (molarity, molality, normality, mole fraction, M1V1 = M2V2 dilution, pH/[H+]/pOH), Physics Calculator (solving whichever variable is left empty across mechanics, waves, and Ohm’s Law), DNA/RNA Converter (T↔U, complement, and reverse complement), and Heat Index Calculator (NWS Rothfusz apparent temperature in °F/°C with risk bands, condition comparisons, and a dynamic reference table).',
     icon: 'FlaskConical',
-    seoTitle: `Science Tools — 3 STEM Calculators | ${SITE_CONFIG.siteName}`,
+    seoTitle: `Science Tools — 4 STEM Calculators | ${SITE_CONFIG.siteName}`,
     seoDescription:
-      'Explore 3 upcoming browser-based Science Tools: Chemistry Solutions Calculator, Physics Calculator, and DNA/RNA Converter.',
+      'Explore 4 browser-based Science Tools: Chemistry Solutions Calculator, Physics Calculator, DNA/RNA Converter, and Heat Index Calculator.',
     faqs: [
       {
         question: 'Do Science Tools use AI or server computation?',
         answer:
-          'No. Every chemistry, physics, and DNA/RNA formula runs deterministically inside your browser tab.',
+          'No. Every chemistry, physics, DNA/RNA, and heat index formula runs deterministically inside your browser tab.',
       },
       {
         question: 'Can Physics Calculator solve for any missing variable?',
@@ -425,7 +425,7 @@ export const CATEGORIES: readonly ToolCategory[] = [
       {
         question: 'Are Science Tools free without sign-up?',
         answer:
-          'Yes. All 3 tools are free, private, and require zero login.',
+          'Yes. All 4 tools are free, private, and require zero login.',
       },
     ],
   },

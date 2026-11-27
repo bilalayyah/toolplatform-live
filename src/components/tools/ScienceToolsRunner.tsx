@@ -1,6 +1,7 @@
 import React, {useState, useMemo} from 'react';
-import {Copy, Check, FlaskConical, Atom, Dna, AlertCircle, Sparkles, RefreshCw, Download} from 'lucide-react';
+import {Copy, Check, FlaskConical, Atom, Dna, AlertCircle, Sparkles, RefreshCw, Download, Thermometer} from 'lucide-react';
 import type {Tool} from '../../data/tools';
+import {HeatIndexWorkspace} from './HeatIndexWorkspace';
 
 interface Props {
   tool: Tool;
@@ -24,6 +25,7 @@ export function ScienceToolsRunner({tool}: Props) {
             {tool.slug === 'science-chemistry-solutions-calculator' && <FlaskConical className="h-5 w-5" />}
             {tool.slug === 'science-physics-calculator' && <Atom className="h-5 w-5" />}
             {tool.slug === 'science-dna-rna-converter' && <Dna className="h-5 w-5" />}
+            {tool.slug === 'heat-index-calculator' && <Thermometer className="h-5 w-5" />}
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-950 dark:text-white">
@@ -49,6 +51,9 @@ export function ScienceToolsRunner({tool}: Props) {
         )}
         {tool.slug === 'science-dna-rna-converter' && (
           <DnaRnaConverter onCopy={copyText} copiedKey={copiedKey} />
+        )}
+        {tool.slug === 'heat-index-calculator' && (
+          <HeatIndexWorkspace onCopy={copyText} copiedKey={copiedKey} />
         )}
       </div>
     </div>

@@ -1,0 +1,269 @@
+# BATCH 13 — 1 NEW TOOL: HEAT INDEX CALCULATOR
+
+## 1. PROJECT CONTEXT (read first)
+
+You are working on an existing multi-tool website built in Google AI Studio.
+
+- **App name:** OmniTool (the site is branded **ToolPlatform** everywhere — do not change the brand name).
+- **Account:** shaheensukheera@gmail.com
+- **App ID:** da00ba3d-9ed4-4ae2-bea3-c68df26ffb8c
+- **App URL:** https://aistudio.google.com/apps/da00ba3d-9ed4-4ae2-bea3-c68df26ffb8c — note the account index in the URL (u/0 or u/1) varies by session; the **app ID is what matters**. You are already signed in and on the app page in the current window — **continue in this same window. Do NOT navigate away, do NOT sign out, do NOT switch accounts.**
+- **Stack:** React + TypeScript + Vite + Tailwind. Tool registry in `src/data/tools.ts` (aggregates per-category files). Tool pages are registry-driven (`src/pages/ToolPage.tsx`). Brand values live in `src/config/site.ts`. The site is LIVE at https://toolplatform.pages.dev/ (repo bilalayyah/toolplatform-live, branch main).
+- **Work in DESKTOP mode. Use FREE models only — try Gemini 4 Hydrogen first; if it hits its daily limit, try the other free models (Gemini Flash Latest, Gemini 3.5 Flash Lite, Gemini Flash-Lite Latest). Never use a paid model.** If every free model shows a daily limit, stop and report the reset times — do not start a paid model or an upgrade.
+- **Do NOT create a new app. Do NOT deploy to Cloudflare. Do NOT buy anything or use any paid service. Syncing the finished change to GitHub (Section 5) IS part of this task.**
+
+## 2. WHAT THIS BATCH IS
+
+Build **1 NEW tool** on ToolPlatform — the Heat Index Calculator, from a master prompt the user sent for the sister site UtilityFlow (where it is NOT built yet — the prompt itself is the spec, see §3.2). Same functionality, same title/keywords/SEO, but FRESHLY WRITTEN original content so nothing looks copy-pasted.
+
+1. **Heat Index Calculator** — `heat-index-calculator` — into the **Science Tools** category (currently 3 tools → 4).
+
+After this batch: **175 tools, 15 categories, sitemap 199 URLs** (assuming Batches 11–12 have landed: 174 tools, 198 URLs — see the Section 0 guard).
+
+**One landing page per tool, with complete on-page SEO (How-to, About, FAQs, honest limits). NO separate articles, NO blog posts, NO supporting article pages.** The user has ordered this explicitly for every tool on every site: build the tool only.
+
+> ⚠️ **CRITICAL LESSON FROM BATCH 3 — READ THIS FIRST.** In Batch 3 the prompt listed 24 tool names, but the app registry had DIFFERENT names — only 8 overlapped, and 12 prompted tools did not exist in the app at all. The slug in this batch was verified FREE in the ToolPlatform registry (`src/data/tools.ts` — 0 hits for `heat-index-calculator`, and for the words `heat-index` / `heatindex` / `feels-like` / `dew-point` / `wind-chill` / `weather-calculator` anywhere). **Before you build or change anything, re-check the slug against the registry yourself. If it already exists, STOP and report it as already-present in your final report — never substitute a different tool, never rename an existing tool, never invent a tool, and never silently build a tool under a different slug.** If a registry file is named differently from the names in Section 3, find the registry through `src/data/tools.ts` — the slug check above is what matters, not the filenames.
+
+## 3. FACTS — VERIFIED FROM THE REPOS (use them verbatim)
+
+### 3.1 ToolPlatform today (repo bilalayyah/toolplatform-live, main, HEAD 5a02f36 — before Batches 11–12 land)
+
+- **171 tools, 15 categories. Sitemap: 195 URLs** (live). The sitemap is generated at build time by the vite plugin from `src/lib/seoFiles.ts` (`generateSitemapXml()`) — it updates automatically from the registry; verify the built sitemap has 199 URLs after this batch (see the Section 0 guard — Batches 11–12 must have landed first).
+- **Tool type** (`src/data/tools.ts`, `export interface Tool` line 142): `id`, `name`, `slug`, `category: ToolCategoryId`, `url` (`/<slug>`), `description`, `longDescription`, `keywords: string[]`, `icon` (lucide-react icon name), `acceptedFormats: string[]`, `maxFileSizeMB: number | null`, `maxFiles: number | null`, `processingMethod`, `seoTitle`, `seoDescription`, `howTo: [ToolHowToStep, ToolHowToStep, ToolHowToStep]` (**exactly 3 steps — type-enforced tuple**, line 162), `faqs: ToolFaq[]`, `relatedTools: [string, string, string, string]` (**exactly 4 slugs**, line 164), `popular: boolean`, `featured: boolean`, `rating: null`, `status: 'active' | 'coming-soon'`, `guide?: ToolGuide` (OPTIONAL — **only Compress PDF has one; this new tool must NOT have a `guide` field** — it uses the standard ToolPage layout).
+- **ToolPage rendering** (`src/pages/ToolPage.tsx`): "How to Use {tool.name}" from `tool.howTo` (3 steps), "About {tool.name}" from `longDescription`, "Frequently Asked Questions" via `<FaqAccordion faqs={tool.faqs} />`, FAQ JSON-LD via `buildFaqSchema(tool.faqs)`.
+- **Runners** (`src/components/tools/ActiveToolRunner.tsx`): category `'science-tools'` → `<ScienceToolsRunner tool={tool} />` (line 146). **No ActiveToolRunner change is needed** — just add the registry entry and the runner branch below.
+  - `src/components/tools/ScienceToolsRunner.tsx` (1,248 lines) dispatches by slug: `tool.slug === 'science-chemistry-solutions-calculator' && (<ChemistryCalculator onCopy={copyText} copiedKey={copiedKey} />)` (line 44), `science-physics-calculator` → `<PhysicsCalculator ... />` (line 47), `science-dna-rna-converter` → `<DnaRnaConverter ... />` (line 50). Header icon dispatch at lines 24–26 (`FlaskConical` / `Atom` / `Dna`). Add a fourth branch for `heat-index-calculator` in the same pattern (same `onCopy` / `copiedKey` props pattern, same header-bar structure).
+- **Science Tools** (`src/data/scienceTools.ts`, `SCIENCE_TOOLS`): 3 tools — Chemistry Solutions Calculator (`science-chemistry-solutions-calculator`), Physics Calculator (`science-physics-calculator`), DNA/RNA Converter (`science-dna-rna-converter`). Category entry (`src/data/tools.ts`, line 396): id `'science-tools'`, name `'Science Tools'`, shortName `'Science'`, description `'Browser-based chemistry solution calculators, multi-formula physics solvers, and DNA/RNA sequence converters.'`, intro `'Science Tools brings 3 deterministic STEM calculators directly to your browser: Chemistry Solutions Calculator (molarity, molality, normality, mole fraction, M1V1 = M2V2 dilution, pH/[H+]/pOH), Physics Calculator (solving whichever variable is left empty across mechanics, waves, and Ohm’s Law), and DNA/RNA Converter (T↔U, complement, and reverse complement).'`, icon `'FlaskConical'`, seoTitle `` `Science Tools — 3 STEM Calculators | ${SITE_CONFIG.siteName}` ``, seoDescription `'Explore 3 upcoming browser-based Science Tools: Chemistry Solutions Calculator, Physics Calculator, and DNA/RNA Converter.'`, 4 FAQs (Q1 'Do Science Tools use AI or server computation?' — answer says 'No. Every chemistry, physics, and DNA/RNA formula runs deterministically inside your browser tab.'; Q2 'Can Physics Calculator solve for any missing variable?'; Q3 'What chemistry calculations are supported?'; Q4 'Are Science Tools free without sign-up?' — answer says 'Yes. All 3 tools are free, private, and require zero login.').
+- **Related-tool reality check (verified by grep — read this before writing `relatedTools`):** of the UtilityFlow prompt's suggested related tools, ONLY ONE exists on ToolPlatform: the **Unit Converter** (`unit-unit-converter`, `src/data/unitConverters.ts` — its description/keywords cover temperature, °C ↔ °F conversion). These do NOT exist on ToolPlatform (0 hits each in `tools.ts`): Temperature Converter, Celsius to Fahrenheit Converter, Fahrenheit to Celsius Converter, Humidity Converter, Weather Calculator, Dew Point Calculator, Wind Chill Calculator. **Never list any of those as related tools** — they do not exist here. The 4 related slugs are in §1.1.
+- **No overlapping tool exists on ToolPlatform:** there is NO heat index, feels-like, dew point, wind chill, or weather calculator (0 hits for `heat-index` / `heatindex` / `feels-like` / `dew-point` / `wind-chill` / `weather-calculator` in `tools.ts`). The Unit Converter covers °C ↔ °F conversion only — it does not calculate apparent temperature, so it is a related tool, not an overlap.
+- **Counts on the homepage:** `src/pages/HomePage.tsx:406` renders `Explore All {TOOLS.length} Tools` (**dynamic — renders 175 automatically once the tools are added**). `HomePage.tsx:60` (FAQ answer) and `:155` (seoDescription) also use `TOOLS.length` dynamically. `index.html` has a HARDCODED count: `'Explore 171 online tools across PDF, media, productivity, unit converter, number system, lookup, science, generator, developer, document, and finance suites.'` in 3 places (meta description, og:description, twitter:description — lines 9, 14, 22) — update all 3 to 175 (see Section 2 of the build; whatever number is currently there — 171, 173 or 174 depending on whether Batches 11–12 landed — the target is 175).
+- **⚠️ "174+ Free Tools" hero line — COULD NOT BE VERIFIED.** A previous check claimed the homepage hero says "174+ Free Tools", but a fresh search found NO such string anywhere: 0 hits in `src/config/site.ts`, `src/App.tsx`, `src/pages/HomePage.tsx`, `src/components/Header.tsx`, `src/components/Footer.tsx`, `src/pages/AboutPage.tsx`, `src/pages/AllToolsPage.tsx`, `src/pages/CategoryPage.tsx`, `src/lib/seoFiles.ts`, `index.html`, and 0 exact hits in the current live JS bundle. Do NOT invent a "175+ Free Tools" hero line. Section 2 orders you to search the rendered homepage for any count display (`174+` / `175+`): if one exists, update it to "175+"; if none exists, report exactly that in the verification table.
+
+### 3.2 No reference build on UtilityFlow (the prompt itself is the spec)
+
+The UtilityFlow version of this tool is NOT built yet — it is 4th in the UtilityFlow queue. Verified from the UtilityFlow repo (bilalayyah/utilityflow): the FULL repo tree contains NO path with `heat` in it (tree not truncated), and the three most likely file paths all return HTTP 404 (`src/tools/calculators/HeatIndexCalculatorTool.tsx`, `src/tools/calculators/heatIndex.ts`, `src/tools/heat-index-calculator.tsx`). There is no reference implementation to port — implement from the master prompt's specification in §1.2 below.
+
+### 3.3 What stays THE SAME (user order) vs what is REWRITTEN
+
+- **SAME:** functionality (the NWS Rothfusz engine with the EXACT coefficients in §1.2, both humidity adjustments, the simple approximation below 80°F, °F/°C in and out, risk bands, comparison mode, reference table, test values in §1.5); title, keywords (the 11 in §1.1), seoTitle text, seoDescription text; FAQ QUESTIONS (the 18 questions listed in §1.1 — they are the keyword-targeted questions users ask); the word-count band (1,500–2,000 words, measured as longDescription + howTo titles/descriptions + FAQ questions/answers — count by script, see Section 3).
+- **REWRITTEN FRESH (mandatory — this is the whole point of the batch):** longDescription wording, howTo step wording, ALL FAQ ANSWERS (fresh words, same questions, same facts), and ALL in-tool EXAMPLES (example buttons, worked examples in the content — use the DIFFERENT values given in §1.4, never the master prompt's §19 test values as examples). **No sentence may be copied from any other site's heat index content.** The seoTitle/seoDescription/shortDescription stay verbatim because they are SEO metadata the user ordered unchanged — everything else on the page is fresh copy. If you are ever unsure whether a sentence is fresh, rewrite it again.
+- **VERBATIM (do NOT rewrite):** the §17 safety disclaimer in §1.1 — it is a safety disclaimer, not copy to rewrite. The three NWS reference URLs in §1.1 stay as references. Do NOT claim any affiliation with NOAA or the National Weather Service.
+- **ENGLISH ONLY.** ToolPlatform is English-only. The other 11 languages are shown as Coming Soon — NOT links, no routes, no sitemap entries, no hreflang. **Do NOT include locale files, locale overrides, or any i18n work in this build.**
+
+## 4. NON-NEGOTIABLE RULES
+
+1. **TEMPLATE / FORMULA-BASED ONLY. NO AI.** Do not call any AI model. No Gemini API, no API keys of any kind, no server-side calls, no external platform APIs, no network calls to any AI service. All calculation is deterministic, client-side formula logic. Never present formula output as AI-generated.
+2. **NO FAKE OUTPUTS.** Never use hardcoded demonstration results, random meaningless outputs, fake success messages, placeholder calculations, static sample responses presented as real results, buttons that do nothing, or artificial loading animations without actual processing. **Every button must perform its advertised action. Every input must influence the actual output.** The reference table (§1.3) must be generated from the same tested engine — NO hardcoded table values.
+3. **FIX THE PROMISES, NOT JUST THE CODE.** Where a tool page's How-to steps or FAQs promise a feature the workspace does not have, either implement the feature or rewrite the How-to/FAQ text so it promises ONLY what the workspace actually does. Never leave a documented promise unfulfilled.
+4. **PRESERVE ALL EXISTING URLs, SLUGS AND ROUTES.** Do not rename any tool, change any slug, or remove any tool. The new slug must be exactly `heat-index-calculator` (Section 2 lesson). **The Most Popular 12 must NEVER change** — this new tool is `popular: false`, `featured: false`.
+5. **DO NOT BREAK WORKING TOOLS.** Reuse existing correct components and engines where they fit; do not rebuild unrelated pages. Do not redesign the site.
+6. **NO PRICING, NO EXPORT.** The pricing page and the Live Export View were removed from this site by the user and must stay removed. Do NOT re-add any pricing mention, promo, $11.99 / Lifetime Premium copy, Export button, export preview, or "Recent Results" export history on the new page. Verify at the end that none exist on the new page. (A Print button that calls `window.print()` on the result area only is NOT the removed export system — it is a standard browser function. Do NOT add any download/export panel, Export button, or PDF export.)
+7. **NO NEW DEPENDENCIES.** Use only packages already in `package.json`. No new libraries.
+8. **HONEST LABELS ONLY.** State every limit honestly on the page (see the "Honest limits" list in §1.3). Never claim a feature the tool does not have. Never invent search volumes, CPC, or keyword difficulty. Never keyword-stuff safety content.
+9. **CLEAN CODE.** Proper TypeScript types, modular tool logic, no unnecessary dependencies, no placeholder implementations left behind, no dead code. The build must pass with **0 TypeScript errors**.
+10. **RULE 8 — upload inputs:** this tool needs no file upload. Do NOT add any upload control to it.
+
+## Section 0 — Sync safety (do FIRST, before any edit)
+
+1. **SEQUENCING GUARD — READ FIRST.** Sends in this app are sequential: Batch 11 (Roman Numeral Converter + Online Hourly Calculator) lands first, then Batch 12 (Alphabets to Word Generator), then this batch. **Before editing anything, confirm the registry has 174 tools INCLUDING `roman-numeral-converter`, `online-hourly-calculator` AND `alphabets-to-word-generator`. If any of those three slugs is missing, STOP and report that the earlier batch has not landed — do not build on the stale count, do not invent the missing tools, do not renumber anything yourself.** Only proceed when the guard passes.
+2. Pull the LATEST GitHub state into AI Studio first. The repo has newer files than the app workspace — the new tool must be built on top of the latest main, not on a stale copy. NOTE: a qpdf Protect/Unlock fix, a PDF Editor removal, a Compress PDF guide sample, a Sign PDF clean-stamp change, and the Batch 11 + Batch 12 tools have just landed on main (earlier tasks, same app) — pull latest and do NOT revert or overwrite their changes.
+3. Verify these two files are present in the workspace with EXACTLY this content:
+   - `public/_redirects` — exactly one line: `/* /index.html 200`
+   - `.npmrc` — exactly one line: `legacy-peer-deps=true`
+   If either file is missing or its content differs, restore it to exactly that content before editing anything else. Both files are load-bearing for the live deploy (SPA fallback + npm install).
+4. Verify `bun.lock` is ABSENT from the synced repo. It was deleted from GitHub as stale and must never come back. If the workspace still holds a copy of `bun.lock`, DELETE it now — never restore it, never sync it back to GitHub.
+5. Only after steps 1–4 pass, start the build in Section 1.
+
+## Section 1 — TOOL: HEAT INDEX CALCULATOR (`heat-index-calculator`)
+
+### 1.1 Registry entry (new entry in `src/data/scienceTools.ts`, `SCIENCE_TOOLS`)
+
+- `id: 'heat-index-calculator'`, `name: 'Heat Index Calculator'`, `slug: 'heat-index-calculator'`, `category: 'science-tools'`, `url: '/heat-index-calculator'`.
+- `description` (verbatim, same as the master prompt): `'Calculate the heat index using air temperature and humidity. Find out how hot it feels with our free Fahrenheit and Celsius heat index calculator.'`
+- `keywords` (verbatim, all 11, same order — primary + secondary from the master prompt §11; the related / long-tail / semantic keyword groups belong in the page content, naturally, NOT in this array): `'heat index calculator'`, `'heat index calculator online'`, `'calculate heat index'`, `'heat index calculator Fahrenheit'`, `'heat index calculator Celsius'`, `'feels like temperature calculator'`, `'apparent temperature calculator'`, `'temperature and humidity calculator'`, `'heat index temperature calculator'`, `'heat index formula calculator'`, `'humidity heat calculator'`.
+- `icon`: a lucide-react icon name ALREADY used by another tool in the registry — grep the registry for existing `icon:` values and pick a fitting one (e.g. `Thermometer` if it is already used elsewhere); never invent an icon name.
+- `acceptedFormats: ['Numeric']`, `maxFileSizeMB: null`, `maxFiles: null`, `processingMethod: 'browser'`.
+- `seoTitle` (master prompt title text + the ToolPlatform brand suffix, following the site's pattern): `` `Heat Index Calculator – Calculate Feels Like Temperature | ${SITE_CONFIG.siteName}` ``
+- `seoDescription` (verbatim): `'Calculate the heat index using air temperature and humidity. Find out how hot it feels with our free Fahrenheit and Celsius heat index calculator.'`
+- `howTo`: EXACTLY 3 steps (type-enforced tuple) — fresh wording, condensing: (1) enter air temperature and relative humidity and pick Fahrenheit or Celsius, (2) calculate and read the heat index, the difference from actual temperature, and the risk band, (3) compare two conditions, check the reference table, or reuse a recent calculation from history.
+- `faqs`: EXACTLY the 18 questions below (same questions, in this order) with **freshly rewritten answers** — same facts, new words. **Q6 has NO value in the master prompt — compute it with the implemented engine AND verify it against an independent reference (the NWS heat index calculator) before writing the answer; never invent the number.** The verified reference value is **≈ 95°F (94.6°F unrounded)** — use it as the cross-check, not as a copied claim:
+  1. What is a heat index calculator?
+  2. How do I calculate the heat index?
+  3. What is the heat index formula?
+  4. What is the difference between temperature and heat index?
+  5. How does humidity affect the heat index?
+  6. What is the heat index at 90°F and 50% humidity?
+  7. Can I calculate heat index in Celsius?
+  8. Can I calculate heat index in Fahrenheit?
+  9. What is considered a dangerous heat index?
+  10. What does extreme caution mean?
+  11. What is the Rothfusz regression?
+  12. Is heat index the same as feels like temperature?
+  13. Does direct sunlight affect heat index?
+  14. Is heat index the same as WBGT?
+  15. Can heat index be lower than actual temperature?
+  16. Is this heat index calculator free?
+  17. How accurate is the heat index formula?
+  18. Does this calculator provide live weather information?
+  (Note: Q18 must state plainly that this is a manual calculator using entered temperature and humidity — NOT a live weather forecast. Q14 must state plainly that heat index is NOT the same as Wet Bulb Globe Temperature (WBGT). Q9–Q10 must use the §1.2 risk bands. Q15's answer must explain that the simple-approximation result can sit below the actual temperature in cooler conditions — never claim the heat index is always higher.)
+- `relatedTools`: EXACTLY 4 slugs, all verified to exist in the registry by grep: `'unit-unit-converter'` (the Unit Converter — covers °C ↔ °F), `'science-chemistry-solutions-calculator'`, `'science-physics-calculator'`, `'science-dna-rna-converter'`. (Do NOT list Temperature Converter, Celsius to Fahrenheit Converter, Fahrenheit to Celsius Converter, Humidity Converter, Weather Calculator, Dew Point Calculator, or Wind Chill Calculator — none of them exists on ToolPlatform; see §3.1.)
+- `popular: false`, `featured: false`, `rating: null`, `status: 'active'`. NO `guide` field.
+- `longDescription`: REWRITTEN FRESH (there is no UtilityFlow copy to copy from — write original copy, never lifted from another site). Fresh wording covering, in your own words, the master prompt's 10 content sections: what the heat index is, how to calculate it, the Rothfusz formula, how humidity affects feels-like temperature, the reference chart, the risk categories, Fahrenheit/Celsius conversion, heat index vs actual temperature, the limitations, and practical examples. Word-count band for the whole page's rendered content — longDescription + howTo titles/descriptions + FAQ questions/answers — is **1,500–2,000 words**. Count by script (see Section 3).
+- **Safety disclaimer — VERBATIM, do NOT rewrite (display it visibly but unobtrusively on the page):** `"This calculator provides an estimated heat index based on entered air temperature and relative humidity. Standard heat-index calculations assume shaded conditions with light wind and do not fully account for direct sunlight, wind, clothing, activity level, or individual health factors. For local alerts and safety decisions, consult official weather authorities."`
+- **References (keep as references on the page, with the methodology explained transparently):** https://www.weather.gov/safety/heat-index — https://www.weather.gov/ctp/heat — https://www.weather.gov/epz/wxcalc_heatindex. Do NOT claim any affiliation with NOAA or the National Weather Service.
+
+### 1.2 Engine — new file `src/lib/heatIndex.ts` (pure functions, NWS Rothfusz method, exact specification)
+
+Implement these functions with EXACTLY this behaviour (write the code fresh in this codebase's style — the formulas and rules below are the specification; do NOT copy another calculator's implementation):
+
+- `celsiusToFahrenheit(c: number): number` — `°F = (°C × 9/5) + 32`. `fahrenheitToCelsius(f: number): number` — `°C = (°F − 32) × 5/9`. **Celsius is ALWAYS converted through Fahrenheit only — never use a separate Celsius approximation that could produce inconsistent results.**
+- `heatIndexSimple(tempF: number, rh: number): number` — the NWS preliminary approximation: `HI_simple = 0.5 × (T + 61.0 + ((T − 68.0) × 1.2) + (RH × 0.094))`.
+- `rothfuszRegression(tempF: number, rh: number): number` — the NWS Rothfusz regression, EXACT coefficients:
+  `HI = −42.379 + 2.04901523 × T + 10.14333127 × RH − 0.22475541 × T × RH − 0.00683783 × T² − 0.05481717 × RH² + 0.00122874 × T² × RH + 0.00085282 × T × RH² − 0.00000199 × T² × RH²`
+  where T = air temperature in Fahrenheit, RH = relative humidity in percent (0–100).
+- `lowHumidityAdjustment(tempF: number, rh: number): number` — applies ONLY when RH < 13% AND 80°F ≤ T ≤ 112°F: `Adjustment = ((13 − RH) / 4) × SQRT((17 − ABS(T − 95)) / 17)` — **SUBTRACT** from the regression result.
+- `highHumidityAdjustment(tempF: number, rh: number): number` — applies ONLY when RH > 85% AND 80°F ≤ T ≤ 87°F: `Adjustment = ((RH − 85) / 10) × ((87 − T) / 5)` — **ADD** to the regression result.
+- `calculateHeatIndex(tempF: number, rh: number): { heatIndexF: number; method: 'simple' | 'rothfusz'; lowHumidityAdjustmentApplied: boolean; highHumidityAdjustmentApplied: boolean }` — the full NWS method, in this order: (1) compute `HI_simple`; (2) average it with the actual air temperature: `HI_avg = (HI_simple + T) / 2`; (3) if `HI_avg < 80°F`, use `HI_avg` (method `'simple'`); (4) otherwise apply the full Rothfusz regression plus the applicable humidity adjustment (method `'rothfusz'`). Validate inputs and throw a clear human-readable error for: missing/empty temperature or humidity, non-numeric values, RH < 0% or RH > 100%, non-finite temperature. **Never silently return a misleading value for unsupported conditions** — distinguish invalid input from valid input outside the standard applicability range, and say so on the page.
+- `calculateHeatIndexFromCelsius(tempC: number, rh: number): { heatIndexF: number; heatIndexC: number; method: 'simple' | 'rothfusz'; ... }` — convert °C → °F, calculate, convert the result back to °C. Return both units.
+- `getRiskBand(heatIndexF: number): { band: 'below-caution' | 'caution' | 'extreme-caution' | 'danger' | 'extreme-danger'; label: string; explanation: string }` — NWS reference bands on the calculated heat index: **Caution 80°F to below 90°F; Extreme Caution 90°F to below 103°F; Danger 103°F to below 125°F; Extreme Danger 125°F and above.** Below 80°F there is no band (report "below Caution"). Band explanations (write in fresh words, same meaning): Caution — fatigue may be possible with prolonged exposure or physical activity. Extreme Caution — heat-related illness becomes more concerning with prolonged exposure or physical activity. Danger — the likelihood of heat-related illness increases significantly, especially during prolonged exposure or strenuous activity. Extreme Danger — the risk of severe heat-related illness is very high. Include a reminder to seek a cool environment and urgent medical help if someone develops symptoms of heat stroke. **For Celsius display, convert the threshold values from the Fahrenheit thresholds at display time (80°F = 26.7°C, 90°F = 32.2°C, 103°F = 39.4°C, 125°F = 51.7°C) — never use inconsistently rounded Celsius boundaries.** State plainly on the page that these are general guidance bands, not a personalized medical assessment or an official local weather alert.
+- Round displayed heat-index values to **1 decimal place** (°F and °C); round the difference from actual temperature to 1 decimal place. Never round intermediate calculations.
+
+### 1.3 Tool UI — new branch in `src/components/tools/ScienceToolsRunner.tsx`
+
+Add a fourth branch for `tool.slug === 'heat-index-calculator'` in the same pattern as the existing tools (lines 44/47/50, same `onCopy` / `copiedKey` props, same header-bar structure; add a header icon conditional matching the registry entry's icon).
+
+- **Inputs:** Air Temperature (numeric input), Temperature Unit toggle [Fahrenheit] [Celsius], Relative Humidity (numeric input, 0–100%). Primary button "Calculate Heat Index". Secondary actions: Reset, Copy Result, Try Example.
+- **Result section (prominent):** Actual Air Temperature, Relative Humidity, Calculated Heat Index, Heat Index in Fahrenheit, Heat Index in Celsius, Difference from Actual Temperature. Example display format: Actual Temperature: 100°F, Relative Humidity: 55%, Feels Like Temperature: 124°F, Heat Index: 124°F / 51.1°C. Include a short explanation that heat index represents apparent temperature under the model's assumed conditions, not a direct measurement of body temperature.
+- **Risk panel:** the band from `getRiskBand` with its explanation, plus the §1.1 safety disclaimer.
+- **Comparison mode (INCLUDE — it was optional in the master prompt; if included it must fully work):** two conditions (A and B, each with temperature + humidity + unit), each calculated with the same engine, showing actual temperature, relative humidity, calculated heat index, and the **difference between the two conditions**. Do NOT imply the calculator provides an actual weather forecast.
+- **Reference table (INCLUDE — it was optional in the master prompt; if included it must fully work):** a table of heat index values across temperatures and humidities, **generated from the same tested engine at render time — NO hardcoded values**. Let the user select a temperature and a humidity and view the resulting heat index; the table cells must be computed by the engine, not pasted numbers.
+- **Additional features (all mandatory):** Fahrenheit input, Celsius input, Fahrenheit output, Celsius output, relative humidity input, instant recalculation, Calculate button, Reset button, Copy result, example inputs (§1.4), heat-risk classification, actual vs apparent temperature comparison, calculation explanation, input validation with helpful messages, session-based calculation history (max 8 entries, reuse previous calculations, clear history — no account, session only), print-friendly result via `window.print()` on the result area only (see Rule 6), keyboard navigation, Enter-key support, responsive design. Do not require user registration. Keep calculations client-side — never send user input to a server.
+- **Honest limits (state these on the page):** standard heat-index calculations assume shaded conditions with light wind; they do not fully account for direct sunlight, wind, clothing, activity level, or individual health factors; heat index is NOT the same as WBGT; this calculator is NOT a substitute for official weather warnings; this is a manual calculator using entered values, NOT live weather information; results come only from the data the user enters.
+
+### 1.4 FRESH examples (use THESE in the UI example buttons and in the copy — NOT the master prompt's §19 test values as examples)
+
+- **95°F / 60% → 113.1°F, Danger**
+- **88°F / 45% → 89.4°F, Caution**
+- **102°F / 70% → 151.8°F, Extreme Danger**
+- **30°C / 65% → 93.0°F = 33.9°C, Extreme Caution**
+- **27°C / 40% → 80.4°F = 26.9°C, Caution**
+- Comparison example: **Condition A 90°F / 40% → 90.7°F** vs **Condition B 90°F / 70% → 105.9°F — difference 15.2°F**.
+
+### 1.5 Canonical TEST VALUES (verification table — these stay the same; they are facts, not copy)
+
+- **100°F / 55% → 123.6°F ≈ 124°F, Danger** (master prompt: "approximately 124°F")
+- **96°F / 65% → 121.0°F ≈ 121°F, Danger** (master prompt: "approximately 121°F")
+- **90°F / 70% → 105.9°F ≈ 106°F, Danger** — verify against an independent reference (NWS calculator); tolerance ±1°F
+- **90°F / 50% → 94.6°F ≈ 95°F, Extreme Caution** (FAQ Q6 answer — cross-check value)
+- **32°C / 60% → 89.6°F → 98.7°F = 37.1°C, Extreme Caution** (°C → °F → HI → °C round-trip)
+- **25°C / 50% → 77°F → simple method → 76.9°F = 24.9°C, below Caution** (lower-temperature method applied: HI_simple 76.75°F, averaged with 77°F)
+- **100°F / 10% → 94.1°F** (low-humidity adjustment −0.63 applied; raw Rothfusz 94.8°F)
+- **85°F / 90% → 101.8°F** (high-humidity adjustment +0.20 applied; raw Rothfusz 101.6°F)
+- **100°F / 0% → 91.4°F** (low-humidity adjustment −2.73 applied); **100°F / 100% → 195.3°F, Extreme Danger**
+- **Threshold boundaries (at 90°F):** HI = 90°F at RH ≈ 38%; HI = 103°F at RH ≈ 66%; HI = 125°F at RH ≈ 93% (use as boundary tests with tolerance ±1°F / ±1% RH)
+- **Invalid (all must show a clear error, never a number):** RH −5%, RH 105%, empty temperature, empty humidity, non-numeric temperature/humidity, non-finite values.
+- Also test: °F/°C switching (same conditions give the same heat index within rounding), copy result, reset, comparison mode, reference table cell vs engine, mobile + desktop.
+
+## Section 2 — COUNTS, CATEGORY PAGES & SITE-WIDE UPDATES (do these as part of the batch)
+
+1. **Tool count 174 → 175.** The homepage `Explore All {TOOLS.length} Tools` (HomePage.tsx:406) and the `TOOLS.length` uses at HomePage.tsx:60 and :155 are dynamic — verify they render **175** after the build. Do NOT hardcode the number anywhere dynamic code already computes it.
+2. **`index.html` — hardcoded count (3 places, lines 9, 14, 22):** `'Explore 171 online tools across PDF, media, productivity, unit converter, number system, lookup, science, generator, developer, document, and finance suites.'` — update ALL THREE occurrences to **175** (meta description, og:description, twitter:description). Whatever number is currently there (171, 173 or 174), the target is 175. Verify by grep afterwards: 0 remaining occurrences of the old count strings (`171 online tools`, `173 online tools`, `174 online tools`).
+3. **Science Tools category** (`src/data/tools.ts`, line 396): update the category entry for 3 → 4 tools —
+   - description: `'Browser-based chemistry solution calculators, multi-formula physics solvers, and DNA/RNA sequence converters.'` → add the heat index calculator (e.g. "…, DNA/RNA sequence converters, and a heat index calculator.").
+   - intro: `'Science Tools brings 3 deterministic STEM calculators…'` → **4** tools, reworded to add the Heat Index Calculator (apparent temperature from air temperature + relative humidity, NWS Rothfusz regression, risk bands) in fresh words.
+   - seoTitle: `` `Science Tools — 3 STEM Calculators | ${SITE_CONFIG.siteName}` `` → **4**.
+   - seoDescription: `'Explore 3 upcoming browser-based Science Tools: Chemistry Solutions Calculator, Physics Calculator, and DNA/RNA Converter.'` → **4** tools, naming all four.
+   - Category FAQs (4): Q1 answer ('No. Every chemistry, physics, and DNA/RNA formula runs deterministically inside your browser tab.') → add the heat index formula; Q4 answer ('Yes. All 3 tools are free, private, and require zero login.') → 'All 4 tools are free…'. Q2 (Physics solve any variable) and Q3 (chemistry calculations) stay as-is.
+4. **"174+ Free Tools" hero line — search, do NOT invent.** Open the rendered homepage in the preview and search the whole rendered page AND grep the codebase for a tool-count display (`174+` / `175+`). If a count display exists, update it to **"175+ Free Tools"** and report the file + line. If NO such display exists (the fresh repo + live-bundle search found none), report exactly that in the verification table — **do NOT invent or add a new "175+ Free Tools" hero line**.
+5. **Sitemap 198 → 199 URLs.** The sitemap is generated at build time from the registry (`src/lib/seoFiles.ts`, `generateSitemapXml()`). Verify the BUILT `dist/sitemap.xml` contains **199 `<loc>` entries** including `/heat-index-calculator`, and 0 entries for any removed tool. The sitemap's base domain is the pre-existing placeholder (`toolplatform.example.com`) — do NOT change the base domain in this batch; that is a separate, undecided domain decision.
+6. **Search + category pages:** verify the site search finds the new tool by name and by keyword (`heat`, `heat index`, `feels like`), the Science Tools category page lists 4 tools, and `/tools` shows "Showing 175 of 175 tools".
+
+## Section 3 — CHECKS (run and report all of them)
+
+1. Run `tsc --noEmit` — must be **0 errors**.
+2. Run a production build — must pass. Confirm the built `dist/sitemap.xml` has **199 `<loc>` entries** (Section 2.5).
+3. Run Vitest — **all tests must pass**, including the NEW test file below. A failing test means a reference was missed — find and fix it, do not delete or weaken a test to make it pass.
+   - New file `src/lib/__tests__/heatIndex.test.ts`: every value in §1.5 (including 100°F/55% → 123.6°F, 96°F/65% → 121.0°F, 90°F/70% → 105.9°F, 90°F/50% → 94.6°F, 32°C/60% round-trip → 98.7°F = 37.1°C, 25°C/50% → 76.9°F via the simple method); low-humidity adjustment (100°F/10% → 94.1°F; 100°F/0% → 91.4°F) and high-humidity adjustment (85°F/90% → 101.8°F) with the raw-vs-adjusted values asserted; threshold boundaries (HI = 90/103/125 at 90°F with RH ≈ 38/66/93%, tolerance ±1°F); °F/°C switching consistency (same conditions, same heat index within 0.1°F); invalid inputs (RH −5%, RH 105%, empty, non-numeric) throwing clear errors; risk-band assignment at 79.9/80/89.9/90/102.9/103/124.9/125°F.
+4. **Grep proof:** (a) `heat-index-calculator` appears exactly where it should (registry entry, runner branch, sitemap) and nowhere it should not; (b) 0 remaining old count strings in `index.html` (`171 online tools`, `173 online tools`, `174 online tools`); (c) 0 pricing mentions (`pricing`, `$11.99`, `Lifetime Premium`, `Export` button/preview) on the new page; (d) 0 locale/i18n files added for this tool (grep for new files under `src/locales/` — there must be none); (e) the §17 safety disclaimer appears VERBATIM on the page (copy the exact text from §1.1 and grep for it); (f) the three NWS reference URLs are present on the page.
+5. **Word-count proof (by script, not by eye):** count the words in the new tool's registry entry — longDescription + howTo titles/descriptions + FAQ questions/answers. Must be **1,500–2,000 words**. Report the exact counted number. If it is outside the band, adjust the FAQ answers (add/remove genuinely useful detail — never pad with filler, never keyword-stuff safety content) until it is inside.
+6. Confirm `public/_redirects` still contains exactly `/* /index.html 200`, `.npmrc` still contains exactly `legacy-peer-deps=true`, and `bun.lock` is still absent.
+
+## Section 4 — LIVE VERIFICATION (in the preview, do each yourself)
+
+Use the preview (not the model workspace) for every step. Report a table: Item | Expected | Result. One row per item (use the rows in the Section 5 table below). Do NOT claim "all passed" unless every item was actually checked. Report exact numbers and exact outputs you observed.
+
+1. (a) Page loads; no console errors; the §17 safety disclaimer is visible (quote it).
+2. (b) Enter 100°F / 55% → heat index ≈ 124°F (123.6°F), Danger band.
+3. (c) Enter 96°F / 65% → heat index ≈ 121°F (121.0°F), Danger band.
+4. (d) Enter 90°F / 50% → heat index ≈ 95°F (94.6°F), Extreme Caution band.
+5. (e) Enter 32°C / 60% → heat index ≈ 37.1°C (98.7°F), Extreme Caution band.
+6. (f) Enter 25°C / 50% → heat index ≈ 24.9°C (76.9°F), below Caution, simple method used.
+7. (g) Invalid: RH 105% → clear error, no number; empty temperature → clear error; non-numeric humidity → clear error.
+8. (h) Risk bands: verify the band changes at the boundaries (e.g. 90°F/40% → 90.7°F Caution; 90°F/70% → 105.9°F Danger); Celsius thresholds display as 26.7/32.2/39.4/51.7°C.
+9. (i) °F/°C switch: the same conditions give the same heat index in both units (within rounding).
+10. (j) Example buttons show the FRESH examples (§1.4: 95°F/60%, 88°F/45%, 102°F/70%, 30°C/65%, 27°C/40%) — NOT the master prompt's §19 test values.
+11. (k) Comparison mode: Condition A 90°F/40% → 90.7°F, Condition B 90°F/70% → 105.9°F, difference 15.2°F shown.
+12. (l) Reference table: pick a temperature + humidity and confirm the shown heat index matches the engine (spot-check 100°F/55% = 123.6°F in the table).
+13. (m) Copy button works (clipboard receives the result); Reset clears the inputs; history records the calculation (max 8) and reuse works; Enter key calculates.
+14. (n) Print button opens the browser print dialog for the result area (do NOT add any export/download panel).
+15. (o) The page copy is fresh — spot-check that the About text and FAQ answers do not read as any other site's heat index content (quote one fresh sentence you observed).
+16. (p) Mobile width (375px): the tool fits with zero horizontal overflow.
+17. (q) Confirm NO pricing mentions, NO $11.99 promo, NO Export button / export preview on the new page.
+18. (r) Confirm NO locale/language switcher content, NO non-English text, and NO new files under `src/locales/` for this tool.
+19. (s) Spot-check that nothing else broke: open one existing tool from the Science category (e.g. Physics Calculator) and confirm it works as before.
+
+## Section 5 — SYNC TO GITHUB + VERIFICATION TABLE
+
+1. ONLY after every check in Sections 3–4 passes, sync to GitHub repo **bilalayyah/toolplatform-live**, branch **main**. Verify the sync landed: the repo must show the edited/added files, `.npmrc` and `public/_redirects` present with their exact content, and `bun.lock` absent.
+2. Do NOT deploy to Cloudflare. Do NOT create a new repo. Do NOT push to the old `bilalayyah/toolplatform` repo.
+3. Fill in this verification table from your own live checks (do not copy expected values into the result column — report what you actually observed):
+
+| Item | Expected | Result |
+|---|---|---|
+| Section 0: sequencing guard | Registry has 174 tools incl. roman + hourly + alphabets | |
+| Section 0: latest GitHub state pulled | Workspace matches main | |
+| Section 0: `public/_redirects` | Exactly `/* /index.html 200` | |
+| Section 0: `.npmrc` | Exactly `legacy-peer-deps=true` | |
+| Section 0: `bun.lock` | Absent | |
+| Slug re-checked against registry | FREE, no rename/substitution | |
+| Registry entry | In `scienceTools.ts`, all fields per §1.1 | |
+| Engine | `src/lib/heatIndex.ts`, all §1.2 functions, exact coefficients | |
+| Runner branch | `ScienceToolsRunner.tsx`, 3 existing branches intact | |
+| FAQs | Exactly 18, questions as listed | |
+| FAQ Q6 | Computed with the engine + verified vs independent reference (≈ 95°F) | |
+| Safety disclaimer | §17 text VERBATIM on the page | |
+| NWS references | 3 weather.gov URLs present, no affiliation claimed | |
+| Word count (script) | 1,500–2,000 — exact number | |
+| No locale files | 0 new files under `src/locales/` | |
+| Category update | Science 3→4 (intro/seoTitle/description/FAQs) | |
+| `index.html` count | 0 remaining old count strings (3 places → 175) | |
+| "174+/175+" hero search | Found → updated to "175+" (file:line) OR not found (state so) | |
+| Sitemap (built) | 199 `<loc>` incl. `/heat-index-calculator` | |
+| `tsc --noEmit` | 0 errors | |
+| Production build | Passes | |
+| Vitest | All tests pass incl. new engine tests | |
+| Live: 100°F/55% → ≈124°F | 123.6°F, Danger | |
+| Live: 96°F/65% → ≈121°F | 121.0°F, Danger | |
+| Live: 90°F/50% → ≈95°F | 94.6°F, Extreme Caution | |
+| Live: 32°C/60% → 37.1°C | 98.7°F = 37.1°C, Extreme Caution | |
+| Live: 25°C/50% → 24.9°C | 76.9°F, below Caution, simple method | |
+| Live: RH 105% / empty / non-numeric | Clear errors, no numbers | |
+| Live: risk bands at boundaries | Bands change at 80/90/103/125°F | |
+| Live: °F/°C switch | Same heat index both units | |
+| Live: fresh examples shown | §1.4 values, not §19 test values | |
+| Live: comparison mode | 90.7°F vs 105.9°F, difference 15.2°F | |
+| Live: reference table | Engine-generated, 100°F/55% cell = 123.6°F | |
+| Live: copy / reset / history / Enter | All work | |
+| Live: print button | Opens print dialog, no export panel | |
+| Live: mobile 375px | Zero horizontal overflow | |
+| Homepage / /tools counts | "Explore All 175 Tools" / "Showing 175 of 175 tools" | |
+| Search | `heat` → Heat Index Calculator | |
+| Category page | Science Tools lists 4 tools | |
+| No pricing / export UI | None on the new page | |
+| No non-English content | English only on the page | |
+| Spot-check | Physics Calculator works as before | |
+| GitHub sync | Landed on `bilalayyah/toolplatform-live` main (commit hash) | |
+
+4. ⚠️ BATCH 3 LESSON (again, at the end because it matters): check every file path, line number, state name, and slug against the actual code FIRST, stop and report any mismatch, never substitute, rename, or invent. If anything named in this prompt does not exist in the repo, say so in the report and do NOT guess a replacement. If the slug already exists in the registry, STOP for that tool and report it — never build it under a different slug.
+
+Work in DESKTOP mode, FREE models only — try Gemini 4 Hydrogen first. Complete every section, including the GitHub sync to bilalayyah/toolplatform-live main using the AI Studio GitHub sync control (do NOT use git push from a terminal — the previous batch's git push failed with 'could not read Username for https://github.com: terminal prompts disabled'; use the sync button in AI Studio). Report the full Section 5 verification table with the commit hash in your final message.

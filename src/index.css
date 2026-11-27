@@ -63,3 +63,26 @@
   width: 0;
   height: 0;
 }
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  #heat-index-print-area,
+  #heat-index-print-area * {
+    visibility: visible !important;
+  }
+
+  #heat-index-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border-color: #cbd5e1 !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+  }
+}
+
